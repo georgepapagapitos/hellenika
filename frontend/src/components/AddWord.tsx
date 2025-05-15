@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   TextField,
@@ -25,14 +25,26 @@ import {
   Translate as TranslateIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { WordType, Gender, WordFormData, MeaningFormData } from "../types";
+import { WordType, Gender, WordFormData, MeaningFormData, Word } from "../types";
 import { wordService } from "../services/api";
 import {
   translateToGreek,
   translateToEnglish,
 } from "../services/translationService";
 
-const AddWord = () => {
+interface AddWordProps {
+  editWord?: Word | null;
+  onWordUpdated?: (word: Word) => void;
+  onWordAdded?: (word: Word) => void;
+  onCancel?: () => void;
+}
+
+const AddWord: React.FC<AddWordProps> = ({
+  editWord,
+  onWordUpdated,
+  onWordAdded,
+  onCancel,
+}) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<WordFormData>({
     greek_word: "",
@@ -45,6 +57,21 @@ const AddWord = () => {
     translateToGreek: false,
     translateToEnglish: false,
   });
+
+  useEffect(() => {
+    if (editWord) {
+      setFormData({
+        greek_word: editWord.greek_word,
+        word_type: editWord.word_type,
+        gender: editWord.gender || Gender.MASCULINE,
+        notes: editWord.notes || "",
+        meanings: editWord.meanings.map((m) => ({
+          english_meaning: m.english_meaning,
+          is_primary: m.is_primary,
+        })),
+      });
+    }
+  }, [editWord]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -101,17 +128,23 @@ const AddWord = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await wordService.create(formData);
-      setFormData({
-        greek_word: "",
-        word_type: WordType.NOUN,
-        gender: Gender.MASCULINE,
-        notes: "",
-        meanings: [{ english_meaning: "", is_primary: true }],
-      });
-      navigate("/");
+      if (editWord && editWord.id !== undefined) {
+        const updatedWord = await wordService.update(editWord.id as number, formData);
+        onWordUpdated?.(updatedWord);
+      } else {
+        const newWord = await wordService.create(formData);
+        onWordAdded?.(newWord);
+        setFormData({
+          greek_word: "",
+          word_type: WordType.NOUN,
+          gender: Gender.MASCULINE,
+          notes: "",
+          meanings: [{ english_meaning: "", is_primary: true }],
+        });
+        navigate("/");
+      }
     } catch (error) {
-      console.error("Error adding word:", error);
+      console.error("Error saving word:", error);
     }
   };
 
@@ -207,7 +240,7 @@ const AddWord = () => {
             fontSize: { xs: "1.75rem", sm: "2rem" },
           }}
         >
-          Add New Word
+          {editWord ? "Edit Word" : "Add New Word"}
         </Typography>
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2}>
@@ -545,28 +578,54 @@ const AddWord = () => {
             </Grid>
 
             <Grid size={12}>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                fullWidth
-                size="large"
-                sx={{
-                  mt: 1,
-                  height: "48px",
-                  borderRadius: 2,
-                  textTransform: "none",
-                  fontWeight: 500,
-                  boxShadow: 2,
-                  "&:hover": {
-                    boxShadow: 4,
-                    transform: "translateY(-1px)",
-                  },
-                  transition: "all 0.2s ease-in-out",
-                }}
-              >
-                Add Word
-              </Button>
+              <Box sx={{ display: "flex", gap: 2 }}>
+                {editWord && onCancel && (
+                  <Button
+                    variant="outlined"
+                    color="inherit"
+                    onClick={onCancel}
+                    fullWidth
+                    size="large"
+                    sx={{
+                      mt: 1,
+                      height: "48px",
+                      borderRadius: 2,
+                      textTransform: "none",
+                      fontWeight: 500,
+                      borderColor: "divider",
+                      color: "text.secondary",
+                      "&:hover": {
+                        backgroundColor: "action.hover",
+                        borderColor: "text.secondary",
+                      },
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                )}
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  fullWidth
+                  size="large"
+                  sx={{
+                    mt: 1,
+                    height: "48px",
+                    borderRadius: 2,
+                    textTransform: "none",
+                    fontWeight: 500,
+                    boxShadow: 2,
+                    "&:hover": {
+                      boxShadow: 4,
+                      transform: "translateY(-1px)",
+                    },
+                    transition: "all 0.2s ease-in-out",
+                  }}
+                >
+                  {editWord ? "Update Word" : "Add Word"}
+                </Button>
+              </Box>
             </Grid>
           </Grid>
         </form>
