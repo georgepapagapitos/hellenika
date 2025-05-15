@@ -6,6 +6,8 @@ import {
   Typography,
   Button,
   IconButton,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { NavigateNext, NavigateBefore } from "@mui/icons-material";
 import { Word, WordType } from "../types";
@@ -13,6 +15,10 @@ import { wordService } from "../services/api";
 import RefreshIcon from "@mui/icons-material/Refresh";
 
 const Flashcards = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
+
   const [words, setWords] = useState<Word[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -54,7 +60,7 @@ const Flashcards = () => {
 
   if (words.length === 0) {
     return (
-      <Box sx={{ p: 4, textAlign: "center" }}>
+      <Box sx={{ p: { xs: 2, sm: 4 }, textAlign: "center" }}>
         <Typography variant="h6" color="text.secondary">
           No words available
         </Typography>
@@ -79,17 +85,40 @@ const Flashcards = () => {
       : currentWord.greek_word;
 
   return (
-    <Box sx={{ p: 2, maxWidth: "600px", margin: "0 auto" }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-        <IconButton onClick={handlePrevious} disabled={currentIndex === 0}>
+    <Box
+      sx={{
+        p: { xs: 1, sm: 2 },
+        maxWidth: "600px",
+        margin: "0 auto",
+        width: "100%",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: { xs: 1, sm: 2 },
+          px: { xs: 1, sm: 2 },
+        }}
+      >
+        <IconButton
+          onClick={handlePrevious}
+          disabled={currentIndex === 0}
+          size={isMobile ? "small" : "medium"}
+        >
           <NavigateBefore />
         </IconButton>
-        <Typography variant="h6">
+        <Typography
+          variant={isMobile ? "body1" : "h6"}
+          sx={{ fontWeight: 500 }}
+        >
           {currentIndex + 1} / {words.length}
         </Typography>
         <IconButton
           onClick={handleNext}
           disabled={currentIndex === words.length - 1}
+          size={isMobile ? "small" : "medium"}
         >
           <NavigateNext />
         </IconButton>
@@ -99,57 +128,118 @@ const Flashcards = () => {
         onClick={handleFlip}
         sx={{
           cursor: "pointer",
-          height: "300px",
-          perspective: "1000px",
-          transformStyle: "preserve-3d",
-          transition: "transform 0.6s",
-          transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+          height: { xs: "250px", sm: "300px", md: "350px" },
+          position: "relative",
+          perspective: "1500px",
+          borderRadius: { xs: 2, sm: 3 },
+          backgroundColor: "transparent",
+          boxShadow: "none",
+          p: 1,
         }}
       >
-        <CardContent
+        <Box
           sx={{
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            backfaceVisibility: "hidden",
-            position: "absolute",
+            position: "relative",
             width: "100%",
+            height: "100%",
+            transition: "transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)",
+            transformStyle: "preserve-3d",
             transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
           }}
         >
-          <Typography variant="h4" gutterBottom>
-            {displayWord}
-          </Typography>
-          <Typography variant="subtitle1" color="text.secondary">
-            {currentWord.word_type}
-          </Typography>
-        </CardContent>
-
-        <CardContent
-          sx={{
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            backfaceVisibility: "hidden",
-            position: "absolute",
-            width: "100%",
-            transform: isFlipped ? "rotateY(0deg)" : "rotateY(180deg)",
-          }}
-        >
-          <Typography variant="h5" gutterBottom>
-            {currentWord.meanings.find((m) => m.is_primary)?.english_meaning ||
-              currentWord.meanings[0]?.english_meaning}
-          </Typography>
-          {currentWord.notes && (
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-              {currentWord.notes}
+          <CardContent
+            sx={{
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              position: "absolute",
+              width: "100%",
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+              p: { xs: 2, sm: 3 },
+              borderRadius: "inherit",
+              backgroundColor: "background.paper",
+              boxShadow: (theme) =>
+                `0 2px 8px ${
+                  theme.palette.mode === "dark"
+                    ? "rgba(0,0,0,0.2)"
+                    : "rgba(0,0,0,0.08)"
+                }`,
+            }}
+          >
+            <Typography
+              variant={isMobile ? "h5" : "h4"}
+              gutterBottom
+              sx={{
+                textAlign: "center",
+                wordBreak: "break-word",
+                maxWidth: "100%",
+              }}
+            >
+              {displayWord}
             </Typography>
-          )}
-        </CardContent>
+            <Typography
+              variant={isMobile ? "body1" : "subtitle1"}
+              color="text.secondary"
+              sx={{ textAlign: "center" }}
+            >
+              {currentWord.word_type}
+            </Typography>
+          </CardContent>
+
+          <CardContent
+            sx={{
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              position: "absolute",
+              width: "100%",
+              backfaceVisibility: "hidden",
+              WebkitBackfaceVisibility: "hidden",
+              transform: "rotateY(180deg)",
+              p: { xs: 2, sm: 3 },
+              borderRadius: "inherit",
+              backgroundColor: "background.paper",
+              boxShadow: (theme) =>
+                `0 2px 8px ${
+                  theme.palette.mode === "dark"
+                    ? "rgba(0,0,0,0.2)"
+                    : "rgba(0,0,0,0.08)"
+                }`,
+            }}
+          >
+            <Typography
+              variant={isMobile ? "h6" : "h5"}
+              gutterBottom
+              sx={{
+                textAlign: "center",
+                wordBreak: "break-word",
+                maxWidth: "100%",
+              }}
+            >
+              {currentWord.meanings.find((m) => m.is_primary)
+                ?.english_meaning || currentWord.meanings[0]?.english_meaning}
+            </Typography>
+            {currentWord.notes && (
+              <Typography
+                variant={isMobile ? "body2" : "body1"}
+                color="text.secondary"
+                sx={{
+                  mt: { xs: 1, sm: 2 },
+                  textAlign: "center",
+                  maxWidth: "100%",
+                  wordBreak: "break-word",
+                }}
+              >
+                {currentWord.notes}
+              </Typography>
+            )}
+          </CardContent>
+        </Box>
       </Card>
     </Box>
   );

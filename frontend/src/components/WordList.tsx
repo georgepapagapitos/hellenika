@@ -179,8 +179,8 @@ const WordList = () => {
   }
 
   return (
-    <Box sx={{ p: 2, maxWidth: "1200px", margin: "0 auto" }}>
-      <Typography
+    <Box sx={{ p: { xs: 1, sm: 2 }, maxWidth: "1200px", margin: "0 auto" }}>
+      {/* <Typography
         variant="h4"
         sx={{
           mb: 3,
@@ -190,9 +190,17 @@ const WordList = () => {
         }}
       >
         Greek Words
-      </Typography>
+      </Typography> */}
 
-      <Box sx={{ mb: 3, display: "flex", gap: 2, alignItems: "center" }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          gap: 2,
+          mb: 3,
+          alignItems: { xs: "stretch", sm: "center" },
+        }}
+      >
         <TextField
           fullWidth
           variant="outlined"
@@ -209,10 +217,11 @@ const WordList = () => {
           sx={{
             "& .MuiOutlinedInput-root": {
               borderRadius: 2,
+              backgroundColor: "background.paper",
             },
           }}
         />
-        <FormControl sx={{ minWidth: 120 }}>
+        <FormControl sx={{ minWidth: { xs: "100%", sm: 120 } }}>
           <InputLabel>Type</InputLabel>
           <Select
             value={wordTypeFilter}
@@ -228,7 +237,7 @@ const WordList = () => {
             ))}
           </Select>
         </FormControl>
-        <FormControl sx={{ minWidth: 120 }}>
+        <FormControl sx={{ minWidth: { xs: "100%", sm: 120 } }}>
           <InputLabel>Gender</InputLabel>
           <Select
             value={genderFilter}
@@ -283,7 +292,12 @@ const WordList = () => {
                   color: "text.secondary",
                 }}
               >
-                No words found
+                <Typography variant="h6" gutterBottom>
+                  No words found
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Try adjusting your search or filters
+                </Typography>
               </Box>
             ) : (
               <Table size="small" stickyHeader>
@@ -300,7 +314,16 @@ const WordList = () => {
                 </TableHead>
                 <TableBody>
                   {words.map((word) => (
-                    <TableRow key={word.id} hover>
+                    <TableRow
+                      key={word.id}
+                      hover
+                      sx={{
+                        "&:hover": {
+                          backgroundColor: (theme) =>
+                            alpha(theme.palette.primary.main, 0.04),
+                        },
+                      }}
+                    >
                       <TableCell>{word.greek_word}</TableCell>
                       <TableCell>
                         {word.meanings.find((m) => m.is_primary)
@@ -312,6 +335,10 @@ const WordList = () => {
                           label={word.word_type}
                           color={getWordTypeColor(word.word_type) as any}
                           size="small"
+                          sx={{
+                            fontWeight: 500,
+                            "& .MuiChip-label": { px: 1 },
+                          }}
                         />
                       </TableCell>
                       <TableCell>
@@ -320,6 +347,10 @@ const WordList = () => {
                             label={word.gender}
                             color={getGenderColor(word.gender) as any}
                             size="small"
+                            sx={{
+                              fontWeight: 500,
+                              "& .MuiChip-label": { px: 1 },
+                            }}
                           />
                         )}
                       </TableCell>
@@ -335,6 +366,12 @@ const WordList = () => {
                             color="primary"
                             onClick={() => handleViewDetails(word)}
                             size="small"
+                            sx={{
+                              "&:hover": {
+                                backgroundColor: (theme) =>
+                                  alpha(theme.palette.primary.main, 0.1),
+                              },
+                            }}
                           >
                             <VisibilityIcon fontSize="small" />
                           </IconButton>
@@ -343,6 +380,12 @@ const WordList = () => {
                             onClick={() => setEditingWord(word)}
                             size="small"
                             disabled={word.id === undefined}
+                            sx={{
+                              "&:hover": {
+                                backgroundColor: (theme) =>
+                                  alpha(theme.palette.primary.main, 0.1),
+                              },
+                            }}
                           >
                             <EditIcon fontSize="small" />
                           </IconButton>
@@ -354,6 +397,12 @@ const WordList = () => {
                             }
                             size="small"
                             disabled={word.id === undefined}
+                            sx={{
+                              "&:hover": {
+                                backgroundColor: (theme) =>
+                                  alpha(theme.palette.error.main, 0.1),
+                              },
+                            }}
                           >
                             <DeleteIcon fontSize="small" />
                           </IconButton>
@@ -373,6 +422,8 @@ const WordList = () => {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                flexDirection: { xs: "column", sm: "row" },
+                gap: { xs: 1, sm: 0 },
               }}
             >
               <Typography variant="body2" color="text.secondary">
