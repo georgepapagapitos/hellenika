@@ -54,13 +54,25 @@ const Flashcards = () => {
   }, []);
 
   const handleNext = () => {
-    setIsFlipped(false);
-    setCurrentIndex((prev) => (prev + 1) % words.length);
+    if (isFlipped) {
+      setIsFlipped(false);
+      setTimeout(() => {
+        setCurrentIndex((prev) => (prev + 1) % words.length);
+      }, 800);
+    } else {
+      setCurrentIndex((prev) => (prev + 1) % words.length);
+    }
   };
 
   const handlePrevious = () => {
-    setIsFlipped(false);
-    setCurrentIndex((prev) => (prev - 1 + words.length) % words.length);
+    if (isFlipped) {
+      setIsFlipped(false);
+      setTimeout(() => {
+        setCurrentIndex((prev) => (prev - 1 + words.length) % words.length);
+      }, 800);
+    } else {
+      setCurrentIndex((prev) => (prev - 1 + words.length) % words.length);
+    }
   };
 
   const handleFlip = () => {
