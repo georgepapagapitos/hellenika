@@ -6,7 +6,7 @@ import { School as SchoolIcon } from "@mui/icons-material";
 import theme from "./theme";
 import WordList from "./components/WordList";
 import Flashcards from "./components/Flashcards";
-import AddWord from "./components/AddWord";
+import WordForm from "./components/WordForm";
 
 const App = () => {
   return (
@@ -76,7 +76,7 @@ const App = () => {
             <Container maxWidth="lg">
               <Routes>
                 <Route path="/" element={<WordList />} />
-                <Route path="/add" element={<AddWord />} />
+                <Route path="/add" element={<WordForm onWordAdded={() => {}} />} />
                 <Route path="/flashcards" element={<Flashcards />} />
               </Routes>
             </Container>

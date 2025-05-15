@@ -40,8 +40,8 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
 import { Word, WordType, Gender } from "../types";
-import AddWord from "./AddWord";
 import { wordService } from "../services/api";
+import WordForm from "./WordForm";
 
 const WordList = () => {
   const [words, setWords] = useState<Word[]>([]);
@@ -285,7 +285,7 @@ const WordList = () => {
       </Box>
 
       {editingWord ? (
-        <AddWord
+        <WordForm
           editWord={editingWord}
           onWordUpdated={handleWordUpdated}
           onWordAdded={handleWordAdded}
