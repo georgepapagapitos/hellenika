@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Card,
@@ -6,26 +6,21 @@ import {
   Typography,
   Button,
   IconButton,
-  Paper,
-  List,
-  ListItem,
-  ListItemText,
-  Chip,
-  Stack,
 } from "@mui/material";
 import { NavigateNext, NavigateBefore } from "@mui/icons-material";
-import { Word, WordType, Gender } from "../types";
+import { Word, WordType } from "../types";
 import { wordService } from "../services/api";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 const Flashcards = () => {
   const [words, setWords] = useState<Word[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [showMeaning, setShowMeaning] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false);
 
   const fetchWords = async () => {
     try {
-      const data = await wordService.getAll();
-      setWords(data);
+      const response = await wordService.getAll();
+      setWords(response.items);
     } catch (error) {
       console.error("Error fetching words:", error);
     }
@@ -36,17 +31,17 @@ const Flashcards = () => {
   }, []);
 
   const handleNext = () => {
-    setShowMeaning(false);
+    setIsFlipped(false);
     setCurrentIndex((prev) => (prev + 1) % words.length);
   };
 
   const handlePrevious = () => {
-    setShowMeaning(false);
+    setIsFlipped(false);
     setCurrentIndex((prev) => (prev - 1 + words.length) % words.length);
   };
 
-  const toggleMeaning = () => {
-    setShowMeaning(!showMeaning);
+  const handleFlip = () => {
+    setIsFlipped(!isFlipped);
   };
 
   // Helper to get the article
@@ -59,10 +54,18 @@ const Flashcards = () => {
 
   if (words.length === 0) {
     return (
-      <Box sx={{ textAlign: "center", mt: 4 }}>
-        <Typography variant="h5">
-          No words available. Add some words first!
+      <Box sx={{ p: 4, textAlign: "center" }}>
+        <Typography variant="h6" color="text.secondary">
+          No words available
         </Typography>
+        <Button
+          startIcon={<RefreshIcon />}
+          onClick={fetchWords}
+          sx={{ mt: 2 }}
+          variant="outlined"
+        >
+          Refresh
+        </Button>
       </Box>
     );
   }
@@ -76,91 +79,78 @@ const Flashcards = () => {
       : currentWord.greek_word;
 
   return (
-    <Box sx={{ maxWidth: 600, mx: "auto", mt: 4 }}>
-      <Typography variant="h4" gutterBottom align="center">
-        Flashcards
-      </Typography>
-      <Paper
-        elevation={3}
+    <Box sx={{ p: 2, maxWidth: "600px", margin: "0 auto" }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+        <IconButton onClick={handlePrevious} disabled={currentIndex === 0}>
+          <NavigateBefore />
+        </IconButton>
+        <Typography variant="h6">
+          {currentIndex + 1} / {words.length}
+        </Typography>
+        <IconButton
+          onClick={handleNext}
+          disabled={currentIndex === words.length - 1}
+        >
+          <NavigateNext />
+        </IconButton>
+      </Box>
+
+      <Card
+        onClick={handleFlip}
         sx={{
-          p: 3,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
+          cursor: "pointer",
+          height: "300px",
+          perspective: "1000px",
+          transformStyle: "preserve-3d",
+          transition: "transform 0.6s",
+          transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
         }}
       >
-        <Card sx={{ width: "100%", mb: 2 }}>
-          <CardContent>
-            <Typography variant="h5" align="center" gutterBottom>
-              {displayWord}
+        <CardContent
+          sx={{
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            backfaceVisibility: "hidden",
+            position: "absolute",
+            width: "100%",
+            transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+          }}
+        >
+          <Typography variant="h4" gutterBottom>
+            {displayWord}
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary">
+            {currentWord.word_type}
+          </Typography>
+        </CardContent>
+
+        <CardContent
+          sx={{
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            backfaceVisibility: "hidden",
+            position: "absolute",
+            width: "100%",
+            transform: isFlipped ? "rotateY(0deg)" : "rotateY(180deg)",
+          }}
+        >
+          <Typography variant="h5" gutterBottom>
+            {currentWord.meanings.find((m) => m.is_primary)?.english_meaning ||
+              currentWord.meanings[0]?.english_meaning}
+          </Typography>
+          {currentWord.notes && (
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+              {currentWord.notes}
             </Typography>
-            {showMeaning && (
-              <>
-                <List dense>
-                  {currentWord.meanings.map((meaning) => (
-                    <ListItem key={meaning.id}>
-                      <ListItemText
-                        primary={meaning.english_meaning}
-                        secondary={meaning.is_primary ? "Primary" : "Secondary"}
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  justifyContent="center"
-                  sx={{ mt: 1 }}
-                >
-                  <Chip
-                    label={currentWord.word_type}
-                    color="primary"
-                    size="small"
-                  />
-                  {currentWord.word_type === WordType.NOUN &&
-                    currentWord.gender && (
-                      <Chip
-                        label={currentWord.gender}
-                        color={
-                          currentWord.gender === Gender.MASCULINE
-                            ? "primary"
-                            : currentWord.gender === Gender.FEMININE
-                            ? "secondary"
-                            : "info"
-                        }
-                        size="small"
-                      />
-                    )}
-                </Stack>
-                {currentWord.notes && (
-                  <Typography
-                    variant="body2"
-                    align="center"
-                    color="text.secondary"
-                    sx={{ mt: 1 }}
-                  >
-                    Notes: {currentWord.notes}
-                  </Typography>
-                )}
-              </>
-            )}
-          </CardContent>
-        </Card>
-        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-          <IconButton onClick={handlePrevious} size="large">
-            <NavigateBefore />
-          </IconButton>
-          <Button variant="contained" onClick={toggleMeaning}>
-            {showMeaning ? "Hide Meaning" : "Show Meaning"}
-          </Button>
-          <IconButton onClick={handleNext} size="large">
-            <NavigateNext />
-          </IconButton>
-        </Box>
-        <Typography variant="body2" sx={{ mt: 2 }}>
-          {currentIndex + 1} of {words.length}
-        </Typography>
-      </Paper>
+          )}
+        </CardContent>
+      </Card>
     </Box>
   );
 };

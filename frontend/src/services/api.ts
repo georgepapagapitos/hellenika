@@ -1,6 +1,6 @@
 import axios from "axios";
 import { API_URL } from "../config";
-import { Word, WordFormData } from "../types";
+import { Word, WordFormData, WordType, Gender } from "../types";
 
 // Create a dedicated API client
 const createApiClient = () => {
@@ -13,11 +13,34 @@ const createApiClient = () => {
 
 const api = createApiClient();
 
+interface WordFilters {
+  search?: string;
+  wordType?: WordType | "";
+  gender?: Gender | "";
+  page?: number;
+  size?: number;
+}
+
+interface PaginatedResponse {
+  items: Word[];
+  total: number;
+  page: number;
+  size: number;
+  pages: number;
+}
+
 // Word-related API calls
 export const wordService = {
   // Get all words
-  getAll: async (): Promise<Word[]> => {
-    const response = await api.get(`${API_URL}/words`);
+  getAll: async (filters?: WordFilters): Promise<PaginatedResponse> => {
+    const params = new URLSearchParams();
+    if (filters?.search) params.append("search", filters.search);
+    if (filters?.wordType) params.append("word_type", filters.wordType);
+    if (filters?.gender) params.append("gender", filters.gender);
+    if (filters?.page) params.append("page", filters.page.toString());
+    if (filters?.size) params.append("size", filters.size.toString());
+
+    const response = await api.get(`${API_URL}/words?${params.toString()}`);
     return response.data;
   },
 

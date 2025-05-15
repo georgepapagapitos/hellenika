@@ -1,11 +1,22 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from app.db.database import get_db
 from app.models.models import Meaning as DBMeaning
 from app.models.models import Word as DBWord
 from app.schemas.schemas import Meaning, MeaningCreate, Word, WordCreate
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from pydantic import BaseModel
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
+
+
+class PaginatedResponse(BaseModel):
+    items: List[Word]
+    total: int
+    page: int
+    size: int
+    pages: int
+
 
 router = APIRouter()
 
@@ -48,10 +59,49 @@ def create_word(word: WordCreate, db: Session = Depends(get_db)):
     return db_word
 
 
-@router.get("/", response_model=List[Word])
-def read_words(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    words = db.query(DBWord).order_by(DBWord.greek_word).offset(skip).limit(limit).all()
-    return words
+@router.get("/", response_model=PaginatedResponse)
+def read_words(
+    page: int = Query(1, ge=1),
+    size: int = Query(20, ge=1, le=100),
+    search: Optional[str] = None,
+    word_type: Optional[str] = None,
+    gender: Optional[str] = None,
+    db: Session = Depends(get_db),
+):
+    query = db.query(DBWord)
+
+    # Apply search filter
+    if search:
+        search_term = f"%{search.lower()}%"
+        query = query.filter(
+            or_(
+                DBWord.greek_word.ilike(search_term),
+                DBWord.notes.ilike(search_term),
+                DBWord.meanings.any(DBMeaning.english_meaning.ilike(search_term)),
+            )
+        )
+
+    # Apply word type filter
+    if word_type:
+        query = query.filter(DBWord.word_type == word_type.lower())
+
+    # Apply gender filter
+    if gender:
+        query = query.filter(DBWord.gender == gender.lower())
+
+    # Get total count
+    total = query.count()
+
+    # Calculate pagination
+    skip = (page - 1) * size
+    pages = (total + size - 1) // size  # Ceiling division
+
+    # Apply ordering and pagination
+    words = query.order_by(DBWord.greek_word).offset(skip).limit(size).all()
+
+    return PaginatedResponse(
+        items=words, total=total, page=page, size=size, pages=pages
+    )
 
 
 @router.get("/{word_id}", response_model=Word)
@@ -126,15 +176,14 @@ def delete_word(word_id: int, db: Session = Depends(get_db)):
     db_word = db.query(DBWord).filter(DBWord.id == word_id).first()
     if db_word is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, 
-            detail="Word not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Word not found"
         )
-    
+
     # Delete all meanings associated with the word
     db.query(DBMeaning).filter(DBMeaning.word_id == word_id).delete()
-    
+
     # Delete the word
     db.delete(db_word)
     db.commit()
-    
+
     return {"success": True}
