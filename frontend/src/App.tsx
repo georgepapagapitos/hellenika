@@ -6,6 +6,7 @@ import { School as SchoolIcon } from "@mui/icons-material";
 import theme from "./theme";
 import WordList from "./components/WordList";
 import Flashcards from "./components/Flashcards";
+import AddWord from "./components/AddWord";
 
 const App = () => {
   return (
@@ -50,6 +51,9 @@ const App = () => {
               <Button component={Link} to="/" color="primary" sx={{ mx: 1 }}>
                 Word List
               </Button>
+              <Button component={Link} to="/add" color="primary" sx={{ mx: 1 }}>
+                Add Word
+              </Button>
               <Button
                 component={Link}
                 to="/flashcards"
@@ -72,6 +76,7 @@ const App = () => {
             <Container maxWidth="lg">
               <Routes>
                 <Route path="/" element={<WordList />} />
+                <Route path="/add" element={<AddWord />} />
                 <Route path="/flashcards" element={<Flashcards />} />
               </Routes>
             </Container>

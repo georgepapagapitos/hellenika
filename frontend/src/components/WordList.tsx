@@ -30,10 +30,13 @@ import {
   InputLabel,
   Pagination,
   CircularProgress,
+  Menu,
+  Tooltip,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
 import { Word, WordType, Gender } from "../types";
@@ -66,6 +69,13 @@ const WordList = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [pageSize, setPageSize] = useState(50);
+  const [actionMenu, setActionMenu] = useState<{
+    anchorEl: null | HTMLElement;
+    wordId: number | null;
+  }>({
+    anchorEl: null,
+    wordId: null,
+  });
 
   const fetchWords = useCallback(async () => {
     try {
@@ -86,7 +96,7 @@ const WordList = () => {
     } finally {
       setLoading(false);
     }
-  }, [searchTerm, wordTypeFilter, genderFilter, page]);
+  }, [searchTerm, wordTypeFilter, genderFilter, page, pageSize]);
 
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
@@ -142,28 +152,47 @@ const WordList = () => {
     setDetailsDialog({ open: false, word: null });
   };
 
+  const handleMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    wordId: number
+  ) => {
+    setActionMenu({
+      anchorEl: event.currentTarget,
+      wordId,
+    });
+  };
+
+  const handleMenuClose = () => {
+    setActionMenu({
+      anchorEl: null,
+      wordId: null,
+    });
+  };
+
   const getWordTypeColor = (type: WordType) => {
     const colors: Record<WordType, { bg: string; text: string }> = {
-      [WordType.NOUN]: { bg: "#3B82F6", text: "#FFFFFF" }, // Blue
-      [WordType.VERB]: { bg: "#8B5CF6", text: "#FFFFFF" }, // Purple
-      [WordType.ADJECTIVE]: { bg: "#10B981", text: "#FFFFFF" }, // Green
-      [WordType.ADVERB]: { bg: "#06B6D4", text: "#FFFFFF" }, // Cyan
-      [WordType.PRONOUN]: { bg: "#F59E0B", text: "#FFFFFF" }, // Amber
-      [WordType.PREPOSITION]: { bg: "#EF4444", text: "#FFFFFF" }, // Red
-      [WordType.CONJUNCTION]: { bg: "#6B7280", text: "#FFFFFF" }, // Gray
-      [WordType.ARTICLE]: { bg: "#9CA3AF", text: "#FFFFFF" }, // Light Gray
+      [WordType.NOUN]: { bg: "#EFF6FF", text: "#3B82F6" }, // Light Blue
+      [WordType.VERB]: { bg: "#F5F3FF", text: "#8B5CF6" }, // Light Purple
+      [WordType.ADJECTIVE]: { bg: "#ECFDF5", text: "#10B981" }, // Light Green
+      [WordType.ADVERB]: { bg: "#ECFEFF", text: "#06B6D4" }, // Light Cyan
+      [WordType.PRONOUN]: { bg: "#FFFBEB", text: "#F59E0B" }, // Light Amber
+      [WordType.PREPOSITION]: { bg: "#FEF2F2", text: "#EF4444" }, // Light Red
+      [WordType.CONJUNCTION]: { bg: "#F3F4F6", text: "#6B7280" }, // Light Gray
+      [WordType.ARTICLE]: { bg: "#F9FAFB", text: "#9CA3AF" }, // Lighter Gray
     };
     return colors[type];
   };
 
   const getGenderColor = (gender: Gender) => {
     const colors: Record<Gender, { bg: string; text: string }> = {
-      [Gender.MASCULINE]: { bg: "#2563EB", text: "#FFFFFF" }, // Dark Blue
-      [Gender.FEMININE]: { bg: "#EC4899", text: "#FFFFFF" }, // Pink
-      [Gender.NEUTER]: { bg: "#14B8A6", text: "#FFFFFF" }, // Teal
+      [Gender.MASCULINE]: { bg: "#EFF6FF", text: "#2563EB" }, // Light Blue
+      [Gender.FEMININE]: { bg: "#FDF2F8", text: "#EC4899" }, // Light Pink
+      [Gender.NEUTER]: { bg: "#F0FDFA", text: "#14B8A6" }, // Light Teal
     };
     return colors[gender];
   };
+
+  const getBorderColor = (color: string) => (theme: any) => alpha(color, 0.2);
 
   if (error) {
     return (
@@ -232,7 +261,7 @@ const WordList = () => {
             <MenuItem value="">All</MenuItem>
             {Object.values(WordType).map((type) => (
               <MenuItem key={type} value={type}>
-                {type}
+                {type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()}
               </MenuItem>
             ))}
           </Select>
@@ -248,7 +277,7 @@ const WordList = () => {
             <MenuItem value="">All</MenuItem>
             {Object.values(Gender).map((gender) => (
               <MenuItem key={gender} value={gender}>
-                {gender}
+                {gender.charAt(0).toUpperCase() + gender.slice(1).toLowerCase()}
               </MenuItem>
             ))}
           </Select>
@@ -303,8 +332,8 @@ const WordList = () => {
               <Table size="small" stickyHeader>
                 <TableHead>
                   <TableRow>
-                    <TableCell width="20%">Greek Word</TableCell>
-                    <TableCell width="30%">Primary Meaning</TableCell>
+                    <TableCell width="20%">Greek</TableCell>
+                    <TableCell width="30%">English</TableCell>
                     <TableCell width="15%">Type</TableCell>
                     <TableCell width="15%">Gender</TableCell>
                     <TableCell width="20%" align="center">
@@ -326,33 +355,81 @@ const WordList = () => {
                     >
                       <TableCell>{word.greek_word}</TableCell>
                       <TableCell>
-                        {word.meanings.find((m) => m.is_primary)
-                          ?.english_meaning ||
-                          word.meanings[0]?.english_meaning}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          {word.meanings.find((m) => m.is_primary)?.english_meaning ||
+                            word.meanings[0]?.english_meaning}
+                          {word.meanings.length > 1 && (
+                            <Tooltip 
+                              title={`${word.meanings.length - 1} more meaning${word.meanings.length > 2 ? 's' : ''}`}
+                              arrow
+                              placement="top"
+                            >
+                              <Box
+                                component="span"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleViewDetails(word);
+                                }}
+                                sx={{
+                                  ml: 0.5,
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  color: 'primary.main',
+                                  cursor: 'pointer',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 500,
+                                  opacity: 0.8,
+                                  '&:hover': {
+                                    opacity: 1,
+                                    textDecoration: 'underline',
+                                  },
+                                }}
+                              >
+                                +{word.meanings.length - 1}
+                              </Box>
+                            </Tooltip>
+                          )}
+                        </Box>
                       </TableCell>
                       <TableCell>
                         <Chip
-                          label={word.word_type}
+                          label={word.word_type.toUpperCase()}
                           size="small"
                           sx={{
-                            fontWeight: 500,
-                            "& .MuiChip-label": { px: 1 },
+                            fontWeight: 400,
+                            fontSize: "0.75rem",
+                            "& .MuiChip-label": {
+                              px: 1,
+                              fontWeight: 400,
+                            },
                             backgroundColor: getWordTypeColor(word.word_type)
                               .bg,
                             color: getWordTypeColor(word.word_type).text,
+                            border: "1px solid",
+                            borderColor: getBorderColor(
+                              getWordTypeColor(word.word_type).text
+                            ),
                           }}
                         />
                       </TableCell>
                       <TableCell>
                         {word.word_type === WordType.NOUN && word.gender && (
                           <Chip
-                            label={word.gender}
+                            label={word.gender.toUpperCase()}
                             size="small"
                             sx={{
-                              fontWeight: 500,
-                              "& .MuiChip-label": { px: 1 },
+                              fontWeight: 400,
+                              fontSize: "0.75rem",
+                              "& .MuiChip-label": {
+                                px: 1,
+                                fontWeight: 400,
+                              },
                               backgroundColor: getGenderColor(word.gender).bg,
                               color: getGenderColor(word.gender).text,
+                              border: "1px solid",
+                              borderColor: getBorderColor(
+                                getGenderColor(word.gender).text
+                              ),
                             }}
                           />
                         )}
@@ -362,52 +439,22 @@ const WordList = () => {
                           sx={{
                             display: "flex",
                             justifyContent: "center",
-                            gap: 0.5,
                           }}
                         >
                           <IconButton
-                            color="primary"
-                            onClick={() => handleViewDetails(word)}
                             size="small"
-                            sx={{
-                              "&:hover": {
-                                backgroundColor: (theme) =>
-                                  alpha(theme.palette.primary.main, 0.1),
-                              },
-                            }}
-                          >
-                            <VisibilityIcon fontSize="small" />
-                          </IconButton>
-                          <IconButton
-                            color="primary"
-                            onClick={() => setEditingWord(word)}
-                            size="small"
-                            disabled={word.id === undefined}
-                            sx={{
-                              "&:hover": {
-                                backgroundColor: (theme) =>
-                                  alpha(theme.palette.primary.main, 0.1),
-                              },
-                            }}
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                          <IconButton
-                            color="error"
-                            onClick={() =>
+                            onClick={(e) =>
                               word.id !== undefined &&
-                              handleDeleteClick(word.id)
+                              handleMenuOpen(e, word.id)
                             }
-                            size="small"
-                            disabled={word.id === undefined}
                             sx={{
                               "&:hover": {
                                 backgroundColor: (theme) =>
-                                  alpha(theme.palette.error.main, 0.1),
+                                  alpha(theme.palette.primary.main, 0.1),
                               },
                             }}
                           >
-                            <DeleteIcon fontSize="small" />
+                            <MoreVertIcon fontSize="small" />
                           </IconButton>
                         </Box>
                       </TableCell>
@@ -417,6 +464,58 @@ const WordList = () => {
               </Table>
             )}
           </TableContainer>
+
+          <Menu
+            anchorEl={actionMenu.anchorEl}
+            open={Boolean(actionMenu.anchorEl)}
+            onClose={handleMenuClose}
+            PaperProps={{
+              sx: {
+                borderRadius: 1,
+                boxShadow: (theme) =>
+                  `0 4px 20px ${alpha(theme.palette.primary.main, 0.15)}`,
+              },
+            }}
+          >
+            <MenuItem
+              onClick={() => {
+                const word = words.find((w) => w.id === actionMenu.wordId);
+                if (word) {
+                  handleViewDetails(word);
+                }
+                handleMenuClose();
+              }}
+              sx={{ py: 1 }}
+            >
+              <VisibilityIcon fontSize="small" sx={{ mr: 1 }} />
+              View Details
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                const word = words.find((w) => w.id === actionMenu.wordId);
+                if (word) {
+                  setEditingWord(word);
+                }
+                handleMenuClose();
+              }}
+              sx={{ py: 1 }}
+            >
+              <EditIcon fontSize="small" sx={{ mr: 1 }} />
+              Edit
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                if (actionMenu.wordId !== null) {
+                  handleDeleteClick(actionMenu.wordId);
+                }
+                handleMenuClose();
+              }}
+              sx={{ py: 1, color: "error.main" }}
+            >
+              <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
+              Delete
+            </MenuItem>
+          </Menu>
 
           {!loading && words.length > 0 && (
             <Box
@@ -525,29 +624,45 @@ const WordList = () => {
                   {detailsDialog.word.greek_word}
                 </Typography>
                 <Chip
-                  label={detailsDialog.word.word_type}
+                  label={detailsDialog.word.word_type.toUpperCase()}
                   size="small"
                   sx={{
-                    fontWeight: 500,
-                    "& .MuiChip-label": { px: 1 },
+                    fontWeight: 400,
+                    fontSize: "0.75rem",
+                    "& .MuiChip-label": {
+                      px: 1,
+                      fontWeight: 400,
+                    },
                     backgroundColor: getWordTypeColor(
                       detailsDialog.word.word_type
                     ).bg,
                     color: getWordTypeColor(detailsDialog.word.word_type).text,
+                    border: "1px solid",
+                    borderColor: getBorderColor(
+                      getWordTypeColor(detailsDialog.word.word_type).text
+                    ),
                   }}
                 />
                 {detailsDialog.word.word_type === WordType.NOUN &&
                   detailsDialog.word.gender && (
                     <Chip
-                      label={detailsDialog.word.gender}
+                      label={detailsDialog.word.gender.toUpperCase()}
                       size="small"
                       sx={{
-                        fontWeight: 500,
-                        "& .MuiChip-label": { px: 1 },
+                        fontWeight: 400,
+                        fontSize: "0.75rem",
+                        "& .MuiChip-label": {
+                          px: 1,
+                          fontWeight: 400,
+                        },
                         backgroundColor: getGenderColor(
                           detailsDialog.word.gender
                         ).bg,
                         color: getGenderColor(detailsDialog.word.gender).text,
+                        border: "1px solid",
+                        borderColor: getBorderColor(
+                          getGenderColor(detailsDialog.word.gender).text
+                        ),
                       }}
                     />
                   )}

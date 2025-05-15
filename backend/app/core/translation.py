@@ -1,9 +1,11 @@
 import os
+import logging
 from typing import Optional
 
 import httpx
 from app.core.config import settings
 
+logger = logging.getLogger(__name__)
 GOOGLE_TRANSLATE_API_URL = "https://translation.googleapis.com/language/translate/v2"
 
 
@@ -21,9 +23,10 @@ async def translate_text(text: str, target_language: str) -> Optional[str]:
     try:
         api_key = settings.GOOGLE_TRANSLATE_API_KEY
         if not api_key:
-            print("Google Translate API key is missing")
-            return None
+            logger.error("Google Translate API key is missing")
+            raise ValueError("Google Translate API key is not configured")
 
+        logger.info(f"Translating text to {target_language}: {text}")
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 f"{GOOGLE_TRANSLATE_API_URL}?key={api_key}",
@@ -33,11 +36,18 @@ async def translate_text(text: str, target_language: str) -> Optional[str]:
             data = response.json()
 
             if data.get("data", {}).get("translations"):
-                return data["data"]["translations"][0]["translatedText"]
+                translated_text = data["data"]["translations"][0]["translatedText"]
+                logger.info(f"Translation successful: {translated_text}")
+                return translated_text
+            
+            logger.error("No translation found in response")
             return None
+    except httpx.HTTPError as e:
+        logger.error(f"HTTP error during translation: {str(e)}")
+        raise
     except Exception as e:
-        print(f"Translation error: {str(e)}")
-        return None
+        logger.error(f"Translation error: {str(e)}")
+        raise
 
 
 async def translate_to_greek(text: str) -> Optional[str]:

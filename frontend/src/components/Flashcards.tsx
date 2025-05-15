@@ -9,10 +9,11 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
-import { NavigateNext, NavigateBefore } from "@mui/icons-material";
+import { NavigateNext, NavigateBefore, Shuffle } from "@mui/icons-material";
 import { Word, WordType } from "../types";
 import { wordService } from "../services/api";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import { alpha } from "@mui/material/styles";
 
 const Flashcards = () => {
   const theme = useTheme();
@@ -22,13 +23,30 @@ const Flashcards = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
 
+  const shuffleWords = (wordArray: Word[]) => {
+    const shuffled = [...wordArray];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
   const fetchWords = async () => {
     try {
       const response = await wordService.getAll();
-      setWords(response.items);
+      setWords(shuffleWords(response.items));
+      setCurrentIndex(0);
+      setIsFlipped(false);
     } catch (error) {
       console.error("Error fetching words:", error);
     }
+  };
+
+  const handleShuffle = () => {
+    setWords(shuffleWords(words));
+    setCurrentIndex(0);
+    setIsFlipped(false);
   };
 
   useEffect(() => {
@@ -108,12 +126,26 @@ const Flashcards = () => {
         >
           <NavigateBefore />
         </IconButton>
-        <Typography
-          variant={isMobile ? "body1" : "h6"}
-          sx={{ fontWeight: 500 }}
-        >
-          {currentIndex + 1} / {words.length}
-        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Typography
+            variant={isMobile ? "body1" : "h6"}
+            sx={{ fontWeight: 500 }}
+          >
+            {currentIndex + 1} / {words.length}
+          </Typography>
+          <IconButton
+            onClick={handleShuffle}
+            size={isMobile ? "small" : "medium"}
+            sx={{
+              "&:hover": {
+                backgroundColor: (theme) =>
+                  alpha(theme.palette.primary.main, 0.1),
+              },
+            }}
+          >
+            <Shuffle fontSize={isMobile ? "small" : "medium"} />
+          </IconButton>
+        </Box>
         <IconButton
           onClick={handleNext}
           disabled={currentIndex === words.length - 1}

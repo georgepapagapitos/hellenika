@@ -14,12 +14,20 @@ app = FastAPI(
 )
 
 # Configure CORS
+origins = [
+    "http://localhost:3000",
+    "http://192.168.0.20:3000",
+    "http://192.168.0.20:8000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for local network testing
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=origins,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=3600,
 )
 
 # Include routers

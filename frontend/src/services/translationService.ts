@@ -6,14 +6,34 @@ export const translateToGreek = async (
   text: string
 ): Promise<string | null> => {
   try {
+    console.log("Translating to Greek:", text);
     const response = await axios.post(
       `${API_ENDPOINTS.translation}/to-greek`,
       { text },
-      { withCredentials: true }
+      { 
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        }
+      }
     );
+    console.log("Translation response:", response.data);
     return response.data.translated_text;
   } catch (error) {
-    console.error("Error translating to Greek:", error);
+    if (axios.isAxiosError(error)) {
+      console.error("Error translating to Greek:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          headers: error.config?.headers,
+        }
+      });
+    } else {
+      console.error("Error translating to Greek:", error);
+    }
     return null;
   }
 };
@@ -23,14 +43,34 @@ export const translateToEnglish = async (
   text: string
 ): Promise<string | null> => {
   try {
+    console.log("Translating to English:", text);
     const response = await axios.post(
       `${API_ENDPOINTS.translation}/to-english`,
       { text },
-      { withCredentials: true }
+      { 
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        }
+      }
     );
+    console.log("Translation response:", response.data);
     return response.data.translated_text;
   } catch (error) {
-    console.error("Error translating to English:", error);
+    if (axios.isAxiosError(error)) {
+      console.error("Error translating to English:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          headers: error.config?.headers,
+        }
+      });
+    } else {
+      console.error("Error translating to English:", error);
+    }
     return null;
   }
 };

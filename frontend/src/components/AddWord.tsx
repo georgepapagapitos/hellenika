@@ -12,16 +12,17 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction,
   IconButton,
   Switch,
   FormControlLabel,
   SelectChangeEvent,
+  alpha,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
+  Translate as TranslateIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { WordType, Gender, WordFormData, MeaningFormData } from "../types";
@@ -68,6 +69,13 @@ const AddWord = () => {
   ) => {
     setFormData((prev) => {
       const newMeanings = [...prev.meanings];
+      if (field === "is_primary" && value === true) {
+        // Set all meanings to non-primary first
+        newMeanings.forEach((meaning) => {
+          meaning.is_primary = false;
+        });
+      }
+      // Then set the selected meaning's value
       newMeanings[index] = {
         ...newMeanings[index],
         [field]: value,
@@ -108,17 +116,21 @@ const AddWord = () => {
   };
 
   const handleTranslateToGreek = async (englishText: string, index: number) => {
-    // Only translate if there's text to translate
     if (!englishText.trim()) return;
 
     setLoading((prev) => ({ ...prev, translateToGreek: true }));
     try {
+      console.log("Translating to Greek, input:", englishText);
       const greekText = await translateToGreek(englishText);
+      console.log("Received Greek translation:", greekText);
       if (greekText) {
-        setFormData((prev) => ({
-          ...prev,
-          greek_word: greekText,
-        }));
+        setFormData((prev) => {
+          console.log("Updating form data with Greek translation:", greekText);
+          return {
+            ...prev,
+            greek_word: greekText,
+          };
+        });
       }
     } catch (error) {
       console.error("Error translating to Greek:", error);
@@ -128,21 +140,33 @@ const AddWord = () => {
   };
 
   const handleTranslateToEnglish = async (greekText: string) => {
-    // Only translate if there's text to translate
     if (!greekText.trim()) return;
 
     setLoading((prev) => ({ ...prev, translateToEnglish: true }));
     try {
+      console.log("Translating to English, input:", greekText);
       const englishText = await translateToEnglish(greekText);
+      console.log("Received English translation:", englishText);
       if (englishText) {
-        // Add as a new meaning if we have a meaningful translation
-        setFormData((prev) => ({
-          ...prev,
-          meanings: [
-            ...prev.meanings.map((m) => ({ ...m, is_primary: false })),
+        setFormData((prev) => {
+          console.log("Current form data:", prev);
+          // Keep existing meanings but make them non-primary
+          const existingMeanings = prev.meanings.map(meaning => ({
+            ...meaning,
+            is_primary: false
+          }));
+          
+          const newMeanings = [
             { english_meaning: englishText, is_primary: true },
-          ],
-        }));
+            ...existingMeanings
+          ];
+          console.log("New meanings array:", newMeanings);
+          
+          return {
+            ...prev,
+            meanings: newMeanings,
+          };
+        });
       }
     } catch (error) {
       console.error("Error translating to English:", error);
@@ -152,15 +176,50 @@ const AddWord = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 600, mx: "auto", mt: 4 }}>
-      <Paper sx={{ p: 3 }}>
-        <Typography variant="h5" gutterBottom>
+    <Box 
+      sx={{ 
+        maxWidth: 800, 
+        mx: "auto", 
+        mt: { xs: 1, sm: 3 }, 
+        px: { xs: 2, sm: 0 },
+        pb: { xs: 3, sm: 4 }
+      }}
+    >
+      <Paper 
+        elevation={0}
+        sx={{ 
+          p: { xs: 2, sm: 3 },
+          borderRadius: 3,
+          backgroundColor: "background.paper",
+          border: "1px solid",
+          borderColor: "divider",
+          boxShadow: (theme) => `0 4px 20px ${alpha(theme.palette.primary.main, 0.08)}`,
+        }}
+      >
+        <Typography 
+          variant="h4" 
+          gutterBottom 
+          sx={{ 
+            mb: 3,
+            fontWeight: 600,
+            color: "primary.main",
+            letterSpacing: "-0.02em",
+            fontSize: { xs: "1.75rem", sm: "2rem" },
+          }}
+        >
           Add New Word
         </Typography>
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2}>
             <Grid size={12}>
-              <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}>
+              <Box 
+                sx={{ 
+                  display: "flex", 
+                  flexDirection: { xs: "column", sm: "row" },
+                  gap: 1.5, 
+                  alignItems: { xs: "stretch", sm: "flex-start" } 
+                }}
+              >
                 <TextField
                   fullWidth
                   label="Greek Word"
@@ -168,17 +227,49 @@ const AddWord = () => {
                   value={formData.greek_word}
                   onChange={handleChange}
                   required
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 2,
+                      height: "48px",
+                      "&:hover .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "primary.main",
+                      },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderWidth: 2,
+                      },
+                    },
+                    "& .MuiInputLabel-root": {
+                      "&.Mui-focused": {
+                        color: "primary.main",
+                      },
+                    },
+                  }}
                 />
                 <Button
                   onClick={() => handleTranslateToEnglish(formData.greek_word)}
                   disabled={loading.translateToEnglish || !formData.greek_word}
-                  variant="outlined"
-                  size="medium"
+                  variant="contained"
+                  color="primary"
+                  startIcon={<TranslateIcon />}
+                  sx={{
+                    minWidth: { xs: "100%", sm: "180px" },
+                    height: "48px",
+                    borderRadius: 2,
+                    textTransform: "none",
+                    fontWeight: 500,
+                    boxShadow: 2,
+                    "&:hover": {
+                      boxShadow: 4,
+                      transform: "translateY(-1px)",
+                    },
+                    transition: "all 0.2s ease-in-out",
+                  }}
                 >
                   {loading.translateToEnglish ? "Translating..." : "Greek → English"}
                 </Button>
               </Box>
             </Grid>
+
             <Grid size={{ xs: 12, sm: 6 }}>
               <FormControl fullWidth>
                 <InputLabel>Word Type</InputLabel>
@@ -187,42 +278,137 @@ const AddWord = () => {
                   value={formData.word_type}
                   onChange={handleSelectChange}
                   label="Word Type"
+                  sx={{
+                    borderRadius: 2,
+                    height: "48px",
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "divider",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "primary.main",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderWidth: 2,
+                    },
+                  }}
                 >
                   {Object.values(WordType).map((type) => (
                     <MenuItem key={type} value={type}>
-                      {type}
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
                     </MenuItem>
                   ))}
                 </Select>
               </FormControl>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <FormControl fullWidth>
-                <InputLabel>Gender</InputLabel>
-                <Select
-                  name="gender"
-                  value={formData.gender}
-                  onChange={handleSelectChange}
-                  label="Gender"
-                >
-                  {Object.values(Gender).map((gender) => (
-                    <MenuItem key={gender} value={gender}>
-                      {gender}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+
+            {(formData.word_type === WordType.NOUN || formData.word_type === WordType.ARTICLE) && (
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Gender</InputLabel>
+                  <Select
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleSelectChange}
+                    label="Gender"
+                    sx={{
+                      borderRadius: 2,
+                      height: "48px",
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "divider",
+                      },
+                      "&:hover .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "primary.main",
+                      },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderWidth: 2,
+                      },
+                    }}
+                  >
+                    {Object.values(Gender).map((gender) => (
+                      <MenuItem key={gender} value={gender}>
+                        {gender.charAt(0).toUpperCase() + gender.slice(1)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            )}
+
             <Grid size={12}>
-              <Typography variant="h6" gutterBottom>
+              <Typography 
+                variant="h6" 
+                gutterBottom 
+                sx={{ 
+                  mt: 1,
+                  mb: 2,
+                  fontWeight: 600,
+                  color: "text.primary",
+                  fontSize: { xs: "1.1rem", sm: "1.25rem" },
+                }}
+              >
                 Meanings
               </Typography>
-              <List>
+              <List sx={{ mb: 1 }}>
                 {formData.meanings.map((meaning, index) => (
-                  <ListItem key={index}>
+                  <ListItem
+                    key={index}
+                    sx={{
+                      mb: 1.5,
+                      p: 1.5,
+                      borderRadius: 2,
+                      backgroundColor: alpha("#f8fafc", 0.5),
+                      border: "1px solid",
+                      borderColor: "divider",
+                      transition: "all 0.2s ease-in-out",
+                      "&:hover": {
+                        backgroundColor: alpha("#f8fafc", 0.8),
+                        borderColor: "primary.main",
+                        transform: "translateY(-1px)",
+                        boxShadow: (theme) => `0 4px 12px ${alpha(theme.palette.primary.main, 0.08)}`,
+                      },
+                      position: "relative",
+                    }}
+                  >
+                    {formData.meanings.length > 1 && (
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          bottom: 0,
+                          right: 0,
+                          borderTopLeftRadius: 24,
+                          borderBottomRightRadius: 24,
+                          backgroundColor: alpha("#ef4444", 0.1),
+                          p: 0.5,
+                          "&:hover": {
+                            backgroundColor: alpha("#ef4444", 0.2),
+                          },
+                          transition: "all 0.2s ease-in-out",
+                        }}
+                      >
+                        <IconButton
+                          onClick={() => removeMeaning(index)}
+                          color="error"
+                          size="small"
+                          sx={{
+                            "&:hover": {
+                              backgroundColor: "transparent",
+                            },
+                          }}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    )}
                     <ListItemText
                       primary={
-                        <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}>
+                        <Box 
+                          sx={{ 
+                            display: "flex", 
+                            flexDirection: { xs: "column", sm: "row" },
+                            gap: 1.5, 
+                            alignItems: { xs: "stretch", sm: "flex-start" } 
+                          }}
+                        >
                           <TextField
                             fullWidth
                             label="English Meaning"
@@ -235,15 +421,48 @@ const AddWord = () => {
                               )
                             }
                             required
+                            sx={{
+                              "& .MuiOutlinedInput-root": {
+                                borderRadius: 2,
+                                height: "48px",
+                                "&:hover .MuiOutlinedInput-notchedOutline": {
+                                  borderColor: "primary.main",
+                                },
+                                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                  borderWidth: 2,
+                                },
+                              },
+                              "& .MuiInputLabel-root": {
+                                "&.Mui-focused": {
+                                  color: "primary.main",
+                                },
+                              },
+                            }}
                           />
-                          <Button
-                            onClick={() => handleTranslateToGreek(meaning.english_meaning, index)}
-                            disabled={loading.translateToGreek || !meaning.english_meaning}
-                            variant="outlined"
-                            size="medium"
-                          >
-                            {loading.translateToGreek ? "Translating..." : "English → Greek"}
-                          </Button>
+                          {meaning.is_primary && (
+                            <Button
+                              onClick={() => handleTranslateToGreek(meaning.english_meaning, index)}
+                              disabled={loading.translateToGreek || !meaning.english_meaning}
+                              variant="contained"
+                              color="primary"
+                              startIcon={<TranslateIcon />}
+                              sx={{
+                                minWidth: { xs: "100%", sm: "180px" },
+                                height: "48px",
+                                borderRadius: 2,
+                                textTransform: "none",
+                                fontWeight: 500,
+                                boxShadow: 2,
+                                "&:hover": {
+                                  boxShadow: 4,
+                                  transform: "translateY(-1px)",
+                                },
+                                transition: "all 0.2s ease-in-out",
+                              }}
+                            >
+                              {loading.translateToGreek ? "Translating..." : "English → Greek"}
+                            </Button>
+                          )}
                         </Box>
                       }
                       secondary={
@@ -258,33 +477,45 @@ const AddWord = () => {
                                   e.target.checked
                                 )
                               }
+                              color="primary"
                             />
                           }
                           label="Primary Meaning"
+                          sx={{ 
+                            mt: 0.5,
+                            "& .MuiFormControlLabel-label": {
+                              fontSize: "0.875rem",
+                              color: "text.secondary",
+                            },
+                          }}
                         />
                       }
                     />
-                    <ListItemSecondaryAction>
-                      {formData.meanings.length > 1 && (
-                        <IconButton
-                          edge="end"
-                          onClick={() => removeMeaning(index)}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      )}
-                    </ListItemSecondaryAction>
                   </ListItem>
                 ))}
               </List>
               <Button
                 startIcon={<AddIcon />}
                 onClick={addMeaning}
-                sx={{ mb: 2 }}
+                variant="outlined"
+                color="primary"
+                sx={{
+                  mb: 2,
+                  borderRadius: 2,
+                  textTransform: "none",
+                  fontWeight: 500,
+                  height: "40px",
+                  "&:hover": {
+                    backgroundColor: alpha("#2563eb", 0.04),
+                    transform: "translateY(-1px)",
+                  },
+                  transition: "all 0.2s ease-in-out",
+                }}
               >
                 Add Meaning
               </Button>
             </Grid>
+
             <Grid size={12}>
               <TextField
                 fullWidth
@@ -293,9 +524,26 @@ const AddWord = () => {
                 value={formData.notes}
                 onChange={handleChange}
                 multiline
-                rows={4}
+                rows={3}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 2,
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "primary.main",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderWidth: 2,
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "primary.main",
+                    },
+                  },
+                }}
               />
             </Grid>
+
             <Grid size={12}>
               <Button
                 type="submit"
@@ -303,6 +551,19 @@ const AddWord = () => {
                 color="primary"
                 fullWidth
                 size="large"
+                sx={{
+                  mt: 1,
+                  height: "48px",
+                  borderRadius: 2,
+                  textTransform: "none",
+                  fontWeight: 500,
+                  boxShadow: 2,
+                  "&:hover": {
+                    boxShadow: 4,
+                    transform: "translateY(-1px)",
+                  },
+                  transition: "all 0.2s ease-in-out",
+                }}
               >
                 Add Word
               </Button>
