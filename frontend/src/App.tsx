@@ -2,7 +2,7 @@ import React from "react";
 import { ThemeProvider, CssBaseline, Box, Container } from "@mui/material";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { AppBar, Toolbar, Typography, Button, IconButton } from "@mui/material";
-import { Menu as MenuIcon, School as SchoolIcon } from "@mui/icons-material";
+import { School as SchoolIcon } from "@mui/icons-material";
 import theme from "./theme";
 import WordList from "./components/WordList";
 import Flashcards from "./components/Flashcards";

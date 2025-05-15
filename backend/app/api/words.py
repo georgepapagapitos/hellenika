@@ -6,7 +6,7 @@ from app.models.models import Word as DBWord
 from app.schemas.schemas import Meaning, MeaningCreate, Word, WordCreate
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
-from sqlalchemy import func, or_
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 
@@ -62,7 +62,7 @@ def create_word(word: WordCreate, db: Session = Depends(get_db)):
 @router.get("/", response_model=PaginatedResponse)
 def read_words(
     page: int = Query(1, ge=1),
-    size: int = Query(20, ge=1, le=100),
+    size: int = Query(50, ge=1, le=100),
     search: Optional[str] = None,
     word_type: Optional[str] = None,
     gender: Optional[str] = None,

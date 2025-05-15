@@ -65,7 +65,7 @@ const WordList = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const pageSize = 20;
+  const [pageSize, setPageSize] = useState(50);
 
   const fetchWords = useCallback(async () => {
     try {
@@ -143,24 +143,24 @@ const WordList = () => {
   };
 
   const getWordTypeColor = (type: WordType) => {
-    const colors: Record<WordType, string> = {
-      [WordType.NOUN]: "primary",
-      [WordType.VERB]: "secondary",
-      [WordType.ADJECTIVE]: "success",
-      [WordType.ADVERB]: "info",
-      [WordType.PRONOUN]: "warning",
-      [WordType.PREPOSITION]: "error",
-      [WordType.CONJUNCTION]: "default",
-      [WordType.ARTICLE]: "default",
+    const colors: Record<WordType, { bg: string; text: string }> = {
+      [WordType.NOUN]: { bg: "#3B82F6", text: "#FFFFFF" }, // Blue
+      [WordType.VERB]: { bg: "#8B5CF6", text: "#FFFFFF" }, // Purple
+      [WordType.ADJECTIVE]: { bg: "#10B981", text: "#FFFFFF" }, // Green
+      [WordType.ADVERB]: { bg: "#06B6D4", text: "#FFFFFF" }, // Cyan
+      [WordType.PRONOUN]: { bg: "#F59E0B", text: "#FFFFFF" }, // Amber
+      [WordType.PREPOSITION]: { bg: "#EF4444", text: "#FFFFFF" }, // Red
+      [WordType.CONJUNCTION]: { bg: "#6B7280", text: "#FFFFFF" }, // Gray
+      [WordType.ARTICLE]: { bg: "#9CA3AF", text: "#FFFFFF" }, // Light Gray
     };
     return colors[type];
   };
 
   const getGenderColor = (gender: Gender) => {
-    const colors: Record<Gender, string> = {
-      [Gender.MASCULINE]: "primary",
-      [Gender.FEMININE]: "secondary",
-      [Gender.NEUTER]: "info",
+    const colors: Record<Gender, { bg: string; text: string }> = {
+      [Gender.MASCULINE]: { bg: "#2563EB", text: "#FFFFFF" }, // Dark Blue
+      [Gender.FEMININE]: { bg: "#EC4899", text: "#FFFFFF" }, // Pink
+      [Gender.NEUTER]: { bg: "#14B8A6", text: "#FFFFFF" }, // Teal
     };
     return colors[gender];
   };
@@ -333,11 +333,13 @@ const WordList = () => {
                       <TableCell>
                         <Chip
                           label={word.word_type}
-                          color={getWordTypeColor(word.word_type) as any}
                           size="small"
                           sx={{
                             fontWeight: 500,
                             "& .MuiChip-label": { px: 1 },
+                            backgroundColor: getWordTypeColor(word.word_type)
+                              .bg,
+                            color: getWordTypeColor(word.word_type).text,
                           }}
                         />
                       </TableCell>
@@ -345,11 +347,12 @@ const WordList = () => {
                         {word.word_type === WordType.NOUN && word.gender && (
                           <Chip
                             label={word.gender}
-                            color={getGenderColor(word.gender) as any}
                             size="small"
                             sx={{
                               fontWeight: 500,
                               "& .MuiChip-label": { px: 1 },
+                              backgroundColor: getGenderColor(word.gender).bg,
+                              color: getGenderColor(word.gender).text,
                             }}
                           />
                         )}
@@ -426,9 +429,26 @@ const WordList = () => {
                 gap: { xs: 1, sm: 0 },
               }}
             >
-              <Typography variant="body2" color="text.secondary">
-                Showing {words.length} of {totalItems} words
-              </Typography>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <Typography variant="body2" color="text.secondary">
+                  Showing {words.length} of {totalItems} words
+                </Typography>
+                <FormControl size="small" sx={{ minWidth: 120 }}>
+                  <Select
+                    value={pageSize}
+                    onChange={(e) => {
+                      setPageSize(Number(e.target.value));
+                      setPage(1); // Reset to first page when changing page size
+                    }}
+                    sx={{ height: 32 }}
+                  >
+                    <MenuItem value={25}>25 per page</MenuItem>
+                    <MenuItem value={50}>50 per page</MenuItem>
+                    <MenuItem value={75}>75 per page</MenuItem>
+                    <MenuItem value={100}>100 per page</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
               <Pagination
                 count={totalPages}
                 page={page}
@@ -506,22 +526,28 @@ const WordList = () => {
                 </Typography>
                 <Chip
                   label={detailsDialog.word.word_type}
-                  color={getWordTypeColor(detailsDialog.word.word_type) as any}
                   size="small"
                   sx={{
                     fontWeight: 500,
                     "& .MuiChip-label": { px: 1 },
+                    backgroundColor: getWordTypeColor(
+                      detailsDialog.word.word_type
+                    ).bg,
+                    color: getWordTypeColor(detailsDialog.word.word_type).text,
                   }}
                 />
                 {detailsDialog.word.word_type === WordType.NOUN &&
                   detailsDialog.word.gender && (
                     <Chip
                       label={detailsDialog.word.gender}
-                      color={getGenderColor(detailsDialog.word.gender) as any}
                       size="small"
                       sx={{
                         fontWeight: 500,
                         "& .MuiChip-label": { px: 1 },
+                        backgroundColor: getGenderColor(
+                          detailsDialog.word.gender
+                        ).bg,
+                        color: getGenderColor(detailsDialog.word.gender).text,
                       }}
                     />
                   )}

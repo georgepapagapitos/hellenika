@@ -1,3 +1,4 @@
+import uvicorn
 from app.api import translation, words
 from app.core.config import settings
 from app.db.database import engine
@@ -15,7 +16,7 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.BACKEND_CORS_ORIGINS,
+    allow_origins=["*"],  # Allow all origins for local network testing
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -28,3 +29,6 @@ app.include_router(
     prefix=f"{settings.API_V1_STR}/translation",
     tags=["translation"],
 )
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Hellenika API"
 
     # CORS settings
-    BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:3000"]
+    BACKEND_CORS_ORIGINS: List[str] = ["*"]  # Allow all origins for testing
 
     # Database settings
     POSTGRES_SERVER: str
