@@ -1,9 +1,9 @@
 from typing import Dict, List, Optional
 
 from app.db.database import get_db
-from app.models.models import Meaning as DBMeaning
-from app.models.models import Word as DBWord
-from app.schemas.schemas import Meaning, MeaningCreate, Word, WordCreate
+from app.models.meaning import Meaning as DBMeaning
+from app.models.word import Word as DBWord
+from app.schemas.word import Meaning, MeaningCreate, Word, WordCreate
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
 from sqlalchemy import or_

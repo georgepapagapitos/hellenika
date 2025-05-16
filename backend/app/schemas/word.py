@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from app.models.models import Gender, WordType
+from app.models.word import Gender, WordType
 from pydantic import BaseModel
 
 
@@ -37,4 +37,4 @@ class Word(WordBase):
     meanings: List[Meaning]
 
     class Config:
-        from_attributes = True
+        from_attributes = True 

@@ -1,14 +1,26 @@
 import axios from "axios";
 import { API_URL } from "../config";
 import { Word, WordFormData, WordType, Gender } from "../types";
+import { authService } from "./auth";
 
 // Create a dedicated API client
 const createApiClient = () => {
-  return axios.create({
+  const client = axios.create({
     headers: {
       "Content-Type": "application/json",
     },
   });
+
+  // Add request interceptor to include auth token
+  client.interceptors.request.use((config) => {
+    const token = authService.getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
+
+  return client;
 };
 
 const api = createApiClient();

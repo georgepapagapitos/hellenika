@@ -1,8 +1,7 @@
 import uvicorn
-from app.api import translation, words
+from app.api import translation, words, auth
 from app.core.config import settings
-from app.db.database import engine
-from app.models.models import Base
+from app.db.database import engine, Base
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -31,6 +30,7 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"])
 app.include_router(words.router, prefix=f"{settings.API_V1_STR}/words", tags=["words"])
 app.include_router(
     translation.router,

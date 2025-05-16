@@ -1,10 +1,8 @@
 from enum import Enum
-
-from app.db.database import Base
-from sqlalchemy import Boolean, Column
-from sqlalchemy import Enum as SQLEnum
-from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy import String
 from sqlalchemy.orm import relationship
+from app.db.database import Base
+from sqlalchemy import Column, Integer
 
 
 class WordType(str, Enum):
@@ -34,14 +32,4 @@ class Word(Base):
     notes = Column(String, nullable=True)
     meanings = relationship(
         "Meaning", back_populates="word", cascade="all, delete-orphan"
-    )
-
-
-class Meaning(Base):
-    __tablename__ = "meanings"
-
-    id = Column(Integer, primary_key=True, index=True)
-    english_meaning = Column(String)
-    is_primary = Column(Boolean, default=False)
-    word_id = Column(Integer, ForeignKey("words.id"))
-    word = relationship("Word", back_populates="meanings")
+    ) 
