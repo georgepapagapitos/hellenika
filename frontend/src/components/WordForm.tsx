@@ -26,7 +26,7 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { WordType, Gender, WordFormData, MeaningFormData, Word } from "../types";
-import { wordService } from "../services/api";
+import { wordService } from "../services/wordService";
 import {
   translateToGreek,
   translateToEnglish,
@@ -129,10 +129,10 @@ const WordForm: React.FC<WordFormProps> = ({
     e.preventDefault();
     try {
       if (editWord && editWord.id !== undefined) {
-        const updatedWord = await wordService.update(editWord.id as number, formData);
+        const updatedWord = await wordService.updateWord(editWord.id as number, formData);
         onWordUpdated?.(updatedWord);
       } else {
-        const newWord = await wordService.create(formData);
+        const newWord = await wordService.createWord(formData);
         onWordAdded(newWord);
         setFormData({
           greek_word: "",

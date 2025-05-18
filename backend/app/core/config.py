@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     # Google Translate API settings
     GOOGLE_TRANSLATE_API_KEY: str = ""
 
+    # CORS
+    CORS_ORIGINS: List[str] = ["http://localhost:3000"]  # Default for development
+
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
         return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}/{self.POSTGRES_DB}"

@@ -1,14 +1,9 @@
 import axios from "axios";
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+import { API_ENDPOINTS } from "../config";
 
 // Create a dedicated API client
 const createApiClient = () => {
-  return axios.create({
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  return axios.create();
 };
 
 const api = createApiClient();
@@ -16,6 +11,8 @@ const api = createApiClient();
 export interface User {
   id: number;
   email: string;
+  role: string;
+  is_active: boolean;
 }
 
 export interface LoginCredentials {
@@ -36,11 +33,11 @@ class AuthService {
   }
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const formData = new FormData();
-    formData.append('username', credentials.email);
-    formData.append('password', credentials.password);
+    const params = new URLSearchParams();
+    params.append('username', credentials.email);
+    params.append('password', credentials.password);
 
-    const response = await api.post<AuthResponse>(`${API_URL}/auth/token`, formData, {
+    const response = await api.post<AuthResponse>(API_ENDPOINTS.auth.token, params, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
@@ -51,9 +48,9 @@ class AuthService {
 
   async register(credentials: LoginCredentials): Promise<User> {
     // First register the user
-    await api.post<User>(`${API_URL}/auth/register`, credentials);
+    await api.post<User>(API_ENDPOINTS.auth.register, credentials);
     // Then automatically log in to get the token
-    const authResponse = await this.login(credentials);
+    await this.login(credentials);
     // Finally get the user data
     return this.getCurrentUser();
   }
@@ -80,7 +77,7 @@ class AuthService {
     if (!this.token) {
       throw new Error('No token found');
     }
-    const response = await api.get<User>(`${API_URL}/auth/users/me`, {
+    const response = await api.get<User>(API_ENDPOINTS.auth.me, {
       headers: {
         Authorization: `Bearer ${this.token}`,
       },

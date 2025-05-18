@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Box,
   Card,
@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { NavigateNext, NavigateBefore, Shuffle } from "@mui/icons-material";
 import { Word, WordType } from "../types";
-import { wordService } from "../services/api";
+import { wordService } from "../services/wordService";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { alpha } from "@mui/material/styles";
 
@@ -32,7 +32,7 @@ const Flashcards = () => {
     return shuffled;
   };
 
-  const fetchWords = async () => {
+  const fetchWords = useCallback(async () => {
     try {
       const response = await wordService.getAll();
       setWords(shuffleWords(response.items));
@@ -41,7 +41,7 @@ const Flashcards = () => {
     } catch (error) {
       console.error("Error fetching words:", error);
     }
-  };
+  }, []);
 
   const handleShuffle = () => {
     setWords(shuffleWords(words));
@@ -51,7 +51,7 @@ const Flashcards = () => {
 
   useEffect(() => {
     fetchWords();
-  }, []);
+  }, [fetchWords]);
 
   const handleNext = () => {
     if (isFlipped) {

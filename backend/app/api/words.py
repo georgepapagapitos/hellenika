@@ -8,6 +8,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
+from app.api.auth_deps import get_current_admin_user
+from app.models.user import User
 
 
 class PaginatedResponse(BaseModel):
@@ -171,7 +173,11 @@ def update_word(word_id: int, word: WordCreate, db: Session = Depends(get_db)):
 
 
 @router.delete("/{word_id}", response_model=Dict[str, bool])
-def delete_word(word_id: int, db: Session = Depends(get_db)):
+def delete_word(
+    word_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user)
+):
     # First, check if the word exists
     db_word = db.query(DBWord).filter(DBWord.id == word_id).first()
     if db_word is None:

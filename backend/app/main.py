@@ -13,30 +13,18 @@ app = FastAPI(
 )
 
 # Configure CORS
-origins = [
-    "http://localhost:3000",
-    "http://192.168.0.20:3000",
-    "http://192.168.0.20:8000",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=False,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"],
-    max_age=3600,
 )
 
 # Include routers
 app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"])
 app.include_router(words.router, prefix=f"{settings.API_V1_STR}/words", tags=["words"])
-app.include_router(
-    translation.router,
-    prefix=f"{settings.API_V1_STR}/translation",
-    tags=["translation"],
-)
+app.include_router(translation.router, prefix=f"{settings.API_V1_STR}/translation", tags=["translation"])
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

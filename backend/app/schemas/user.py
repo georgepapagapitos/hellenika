@@ -7,6 +7,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+    role: str = "user"  # Default role is "user"
 
 
 class UserLogin(UserBase):
@@ -16,6 +17,7 @@ class UserLogin(UserBase):
 class User(UserBase):
     id: int
     is_active: bool
+    role: str
 
     class Config:
         from_attributes = True

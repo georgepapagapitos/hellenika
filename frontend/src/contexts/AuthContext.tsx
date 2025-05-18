@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authService, User, LoginCredentials } from '../services/auth';
+import { authService, User, LoginCredentials } from '../services/authService';
 
 interface AuthContextType {
   user: User | null;
@@ -17,6 +17,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchUser = async () => {
+    if (!authService.getToken()) {
+      setUser(null);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const currentUser = await authService.getCurrentUser();
       setUser(currentUser);

@@ -40,10 +40,12 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
 import { Word, WordType, Gender } from "../types";
-import { wordService } from "../services/api";
+import { wordService } from "../services/wordService";
 import WordForm from "./WordForm";
+import { useAuth } from "../contexts/AuthContext";
 
 const WordList = () => {
+  const { user } = useAuth();
   const [words, setWords] = useState<Word[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -127,7 +129,7 @@ const WordList = () => {
   const handleDeleteConfirm = async () => {
     if (deleteDialog.wordId !== null) {
       try {
-        await wordService.delete(deleteDialog.wordId);
+        await wordService.deleteWord(deleteDialog.wordId);
         setWords(
           words.filter(
             (word) => word.id !== undefined && word.id !== deleteDialog.wordId
@@ -503,18 +505,20 @@ const WordList = () => {
               <EditIcon fontSize="small" sx={{ mr: 1 }} />
               Edit
             </MenuItem>
-            <MenuItem
-              onClick={() => {
-                if (actionMenu.wordId !== null) {
-                  handleDeleteClick(actionMenu.wordId);
-                }
-                handleMenuClose();
-              }}
-              sx={{ py: 1, color: "error.main" }}
-            >
-              <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
-              Delete
-            </MenuItem>
+            {user?.role === "admin" && (
+              <MenuItem
+                onClick={() => {
+                  if (actionMenu.wordId !== null) {
+                    handleDeleteClick(actionMenu.wordId);
+                  }
+                  handleMenuClose();
+                }}
+                sx={{ py: 1, color: "error.main" }}
+              >
+                <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
+                Delete
+              </MenuItem>
+            )}
           </Menu>
 
           {!loading && words.length > 0 && (
