@@ -9,10 +9,12 @@ import Flashcards from "./components/Flashcards";
 import WordForm from "./components/WordForm";
 import AuthPage from "./pages/AuthPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
+import AdminDashboard from "./components/AdminDashboard";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
 const Navigation = () => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, user } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -69,6 +71,16 @@ const Navigation = () => {
             >
               Flashcards
             </Button>
+            {user?.role === 'admin' && (
+              <Button
+                component={Link}
+                to="/admin"
+                color="primary"
+                sx={{ mx: 1 }}
+              >
+                Admin Dashboard
+              </Button>
+            )}
             <Button onClick={handleLogout} color="primary" sx={{ mx: 1 }}>
               Logout
             </Button>
@@ -127,6 +139,14 @@ const App = () => {
                       <ProtectedRoute>
                         <Flashcards />
                       </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin"
+                    element={
+                      <AdminRoute>
+                        <AdminDashboard />
+                      </AdminRoute>
                     }
                   />
                 </Routes>
