@@ -34,7 +34,7 @@ const Flashcards = () => {
 
   const fetchWords = useCallback(async () => {
     try {
-      const response = await wordService.getAll();
+      const response = await wordService.getWords();
       setWords(shuffleWords(response.items));
       setCurrentIndex(0);
       setIsFlipped(false);

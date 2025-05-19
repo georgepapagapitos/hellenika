@@ -1,7 +1,9 @@
+from datetime import datetime
 from typing import List, Optional
 
-from app.models.word import Gender, WordType
-from pydantic import BaseModel
+from app.models.word import ApprovalStatus, Gender, WordType
+from app.schemas.user import UserOut
+from pydantic import BaseModel, ConfigDict
 
 
 class MeaningBase(BaseModel):
@@ -16,9 +18,7 @@ class MeaningCreate(MeaningBase):
 class Meaning(MeaningBase):
     id: int
     word_id: int
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class WordBase(BaseModel):
@@ -26,6 +26,7 @@ class WordBase(BaseModel):
     word_type: WordType
     gender: Optional[Gender] = None
     notes: str | None = None
+    approval_status: Optional[ApprovalStatus] = None
 
 
 class WordCreate(WordBase):
@@ -34,7 +35,15 @@ class WordCreate(WordBase):
 
 class Word(WordBase):
     id: int
+    created_at: Optional[datetime]
+    created_by: Optional[int]
+    submitter: Optional[UserOut]
     meanings: List[Meaning]
+    approval_status: ApprovalStatus
+    model_config = ConfigDict(from_attributes=True)
 
-    class Config:
-        from_attributes = True
+    def model_dump(self, **kwargs):
+        data = super().model_dump(**kwargs)
+        if data.get("created_at"):
+            data["created_at"] = data["created_at"].isoformat()
+        return data

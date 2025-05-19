@@ -1,15 +1,16 @@
 from typing import Dict, List, Optional
 
-from app.api.auth_deps import get_current_admin_user
+from app.api.auth_deps import get_current_admin_user, get_current_user
 from app.db.database import get_db
 from app.models.meaning import Meaning as DBMeaning
 from app.models.user import User
+from app.models.word import ApprovalStatus
 from app.models.word import Word as DBWord
-from app.schemas.word import Meaning, MeaningCreate, Word, WordCreate
+from app.schemas.word import Word, WordCreate
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
 from sqlalchemy import or_
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 
 class PaginatedResponse(BaseModel):
@@ -24,7 +25,11 @@ router = APIRouter()
 
 
 @router.post("/", response_model=Word)
-def create_word(word: WordCreate, db: Session = Depends(get_db)):
+def create_word(
+    word: WordCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     # Convert enum values to lowercase for database compatibility
     word_type_value = (
         word.word_type.value
@@ -43,6 +48,8 @@ def create_word(word: WordCreate, db: Session = Depends(get_db)):
         word_type=word_type_value,
         gender=gender_value,
         notes=word.notes,
+        approval_status=ApprovalStatus.PENDING,
+        created_by=current_user.id,
     )
     db.add(db_word)
     db.flush()  # Get the word ID without committing
@@ -68,9 +75,11 @@ def read_words(
     search: Optional[str] = None,
     word_type: Optional[str] = None,
     gender: Optional[str] = None,
+    include_pending: bool = False,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    query = db.query(DBWord)
+    query = db.query(DBWord).options(joinedload(DBWord.submitter))
 
     # Apply search filter
     if search:
@@ -91,6 +100,10 @@ def read_words(
     if gender:
         query = query.filter(DBWord.gender == gender.lower())
 
+    # Filter by approval status
+    if not include_pending or current_user.role != "admin":
+        query = query.filter(DBWord.approval_status == ApprovalStatus.APPROVED)
+
     # Get total count
     total = query.count()
 
@@ -106,36 +119,96 @@ def read_words(
     )
 
 
-@router.get("/{word_id}", response_model=Word)
-def read_word(word_id: int, db: Session = Depends(get_db)):
+@router.get("/pending", response_model=List[Word])
+def get_pending_words(
+    db: Session = Depends(get_db), current_user: User = Depends(get_current_admin_user)
+):
+    return (
+        db.query(DBWord)
+        .options(joinedload(DBWord.submitter))
+        .filter(DBWord.approval_status == ApprovalStatus.PENDING)
+        .all()
+    )
+
+
+@router.post("/{word_id}/approve", response_model=Word)
+def approve_word(
+    word_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user),
+):
     db_word = db.query(DBWord).filter(DBWord.id == word_id).first()
     if db_word is None:
         raise HTTPException(status_code=404, detail="Word not found")
+
+    db_word.approval_status = ApprovalStatus.APPROVED
+    db.commit()
+    db.refresh(db_word)
     return db_word
 
 
-@router.post("/{word_id}/meanings/", response_model=Meaning)
-def add_meaning(word_id: int, meaning: MeaningCreate, db: Session = Depends(get_db)):
+@router.post("/{word_id}/reject", response_model=Word)
+def reject_word(
+    word_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user),
+):
     db_word = db.query(DBWord).filter(DBWord.id == word_id).first()
     if db_word is None:
         raise HTTPException(status_code=404, detail="Word not found")
 
-    db_meaning = DBMeaning(
-        english_meaning=meaning.english_meaning,
-        is_primary=meaning.is_primary,
-        word_id=word_id,
-    )
-    db.add(db_meaning)
+    db_word.approval_status = ApprovalStatus.REJECTED
     db.commit()
-    db.refresh(db_meaning)
-    return db_meaning
+    db.refresh(db_word)
+    return db_word
+
+
+@router.get("/{word_id}", response_model=Word)
+def read_word(
+    word_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    db_word = (
+        db.query(DBWord)
+        .options(joinedload(DBWord.submitter))
+        .filter(DBWord.id == word_id)
+        .first()
+    )
+    if db_word is None:
+        raise HTTPException(status_code=404, detail="Word not found")
+
+    # Only allow viewing pending words if user is admin
+    if (
+        db_word.approval_status == ApprovalStatus.PENDING
+        and current_user.role != "admin"
+    ):
+        raise HTTPException(
+            status_code=403, detail="Not authorized to view pending words"
+        )
+
+    return db_word
 
 
 @router.put("/{word_id}", response_model=Word)
-def update_word(word_id: int, word: WordCreate, db: Session = Depends(get_db)):
+def update_word(
+    word_id: int,
+    word: WordCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     db_word = db.query(DBWord).filter(DBWord.id == word_id).first()
     if db_word is None:
         raise HTTPException(status_code=404, detail="Word not found")
+
+    # Only allow updating if user is admin or if the word is pending
+    if (
+        current_user.role != "admin"
+        and db_word.approval_status != ApprovalStatus.PENDING
+    ):
+        raise HTTPException(
+            status_code=403, detail="Not authorized to update approved words"
+        )
 
     # Convert enum values to lowercase for database compatibility
     word_type_value = (
@@ -154,6 +227,10 @@ def update_word(word_id: int, word: WordCreate, db: Session = Depends(get_db)):
     db_word.word_type = word_type_value
     db_word.gender = gender_value
     db_word.notes = word.notes
+
+    # If user is not admin, set status back to pending
+    if current_user.role != "admin":
+        db_word.approval_status = ApprovalStatus.PENDING
 
     # Delete existing meanings
     db.query(DBMeaning).filter(DBMeaning.word_id == word_id).delete()

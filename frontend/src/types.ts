@@ -15,20 +15,37 @@ export enum Gender {
   NEUTER = "neuter",
 }
 
+export enum ApprovalStatus {
+  PENDING = "pending",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+}
+
 export interface Meaning {
-  id?: number;
+  id: number;
   english_meaning: string;
   is_primary: boolean;
-  word_id?: number;
+  word_id: number;
+}
+
+export interface UserOut {
+  id: number;
+  email: string;
+  role: string;
+  is_active: boolean;
 }
 
 export interface Word {
-  id?: number;
+  id: number;
   greek_word: string;
   word_type: WordType;
   gender?: Gender;
   notes?: string;
+  approval_status: ApprovalStatus;
   meanings: Meaning[];
+  created_at?: string;
+  created_by?: number;
+  submitter?: UserOut;
 }
 
 export interface MeaningFormData {
@@ -41,5 +58,8 @@ export interface WordFormData {
   word_type: WordType;
   gender?: Gender;
   notes?: string;
-  meanings: MeaningFormData[];
+  meanings: {
+    english_meaning: string;
+    is_primary: boolean;
+  }[];
 }

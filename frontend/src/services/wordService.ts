@@ -1,24 +1,17 @@
-import axios from "axios";
 import { API_ENDPOINTS } from "../config";
 import { Gender, Word, WordFormData, WordType } from "../types";
+import { createApiClient } from "../services/apiClient";
 
 // Create a dedicated API client
-const createApiClient = () => {
-  return axios.create({
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-};
-
 const api = createApiClient();
 
 interface WordFilters {
-  search?: string;
-  wordType?: WordType | "";
-  gender?: Gender | "";
   page?: number;
   size?: number;
+  search?: string;
+  wordType?: WordType;
+  gender?: Gender;
+  includePending?: boolean;
 }
 
 interface PaginatedResponse {
@@ -29,26 +22,15 @@ interface PaginatedResponse {
   pages: number;
 }
 
-class WordService {
-  private token: string | null = null;
-
-  constructor() {
-    this.token = localStorage.getItem("token");
-  }
-
-  private getHeaders() {
-    return {
-      Authorization: `Bearer ${this.token}`,
-    };
-  }
-
-  async getAll(filters?: WordFilters): Promise<PaginatedResponse> {
+export const wordService = {
+  async getWords(filters?: WordFilters): Promise<PaginatedResponse> {
     const params = new URLSearchParams();
+    if (filters?.page) params.append("page", filters.page.toString());
+    if (filters?.size) params.append("size", filters.size.toString());
     if (filters?.search) params.append("search", filters.search);
     if (filters?.wordType) params.append("word_type", filters.wordType);
     if (filters?.gender) params.append("gender", filters.gender);
-    if (filters?.page) params.append("page", filters.page.toString());
-    if (filters?.size) params.append("size", filters.size.toString());
+    if (filters?.includePending) params.append("include_pending", "true");
 
     const response = await api.get<PaginatedResponse>(
       `${API_ENDPOINTS.words}?${params.toString()}`,
@@ -57,34 +39,69 @@ class WordService {
       }
     );
     return response.data;
-  }
+  },
 
   async createWord(word: WordFormData): Promise<Word> {
     const response = await api.post<Word>(API_ENDPOINTS.words, word, {
       headers: this.getHeaders(),
     });
     return response.data;
-  }
+  },
 
   async updateWord(id: number, word: WordFormData): Promise<Word> {
     const response = await api.put<Word>(`${API_ENDPOINTS.words}/${id}`, word, {
       headers: this.getHeaders(),
     });
     return response.data;
-  }
+  },
 
   async deleteWord(id: number): Promise<void> {
     await api.delete(`${API_ENDPOINTS.words}/${id}`, {
       headers: this.getHeaders(),
     });
-  }
+  },
 
   async getWordById(id: number): Promise<Word> {
     const response = await api.get<Word>(`${API_ENDPOINTS.words}/${id}`, {
       headers: this.getHeaders(),
     });
     return response.data;
-  }
-}
+  },
 
-export const wordService = new WordService();
+  // Admin only methods
+  async getPendingWords(): Promise<Word[]> {
+    const response = await api.get<Word[]>(`${API_ENDPOINTS.words}/pending`, {
+      headers: this.getHeaders(),
+    });
+    return response.data;
+  },
+
+  async approveWord(id: number): Promise<Word> {
+    const response = await api.post<Word>(
+      `${API_ENDPOINTS.words}/${id}/approve`,
+      null,
+      {
+        headers: this.getHeaders(),
+      }
+    );
+    return response.data;
+  },
+
+  async rejectWord(id: number): Promise<Word> {
+    const response = await api.post<Word>(
+      `${API_ENDPOINTS.words}/${id}/reject`,
+      null,
+      {
+        headers: this.getHeaders(),
+      }
+    );
+    return response.data;
+  },
+
+  getHeaders() {
+    const token = localStorage.getItem("token");
+    return {
+      Authorization: token ? `Bearer ${token}` : "",
+    };
+  },
+};

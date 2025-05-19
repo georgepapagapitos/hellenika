@@ -10,6 +10,7 @@ import {
 } from "@mui/icons-material";
 import {
   AppBar,
+  Badge,
   Box,
   Button,
   Divider,
@@ -28,9 +29,11 @@ import {
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useAdmin } from "../contexts/AdminContext";
 
 const Navbar = () => {
   const { isAuthenticated, logout, user } = useAuth();
+  const { pendingCount } = useAdmin();
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -52,7 +55,11 @@ const Navbar = () => {
               {
                 text: "Admin Dashboard",
                 path: "/admin",
-                icon: <DashboardIcon />,
+                icon: (
+                  <Badge badgeContent={pendingCount} color="error">
+                    <DashboardIcon />
+                  </Badge>
+                ),
               },
             ]
           : []),

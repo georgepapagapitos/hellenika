@@ -84,10 +84,10 @@ const WordList = () => {
   const fetchWords = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await wordService.getAll({
+      const response = await wordService.getWords({
         search: searchTerm,
-        wordType: wordTypeFilter,
-        gender: genderFilter,
+        wordType: wordTypeFilter || undefined,
+        gender: genderFilter || undefined,
         page,
         size: pageSize,
       });

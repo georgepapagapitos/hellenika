@@ -1,6 +1,8 @@
 import {
   Add as AddIcon,
   Analytics as AnalyticsIcon,
+  Check as CheckIcon,
+  Close as CloseIcon,
   ContentPaste as ContentIcon,
   Delete as DeleteIcon,
   Edit as EditIcon,
@@ -30,12 +32,17 @@ import {
   List,
   ListItem,
   ListItemSecondaryAction,
+  ListItemText,
   Paper,
+  Snackbar,
+  TextField,
   Typography,
   useTheme,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAdmin } from "../contexts/AdminContext";
+import { useAuth } from "../contexts/AuthContext";
 import {
   adminService,
   DashboardStats,
@@ -43,14 +50,24 @@ import {
   RecentUser,
 } from "../services/adminService";
 import { wordService } from "../services/wordService";
+import { Word, Meaning } from "../types";
 
 const AdminDashboard: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { refreshPendingCount } = useAdmin();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
   const [recentContent, setRecentContent] = useState<RecentContent[]>([]);
+  const [pendingWords, setPendingWords] = useState<Word[]>([]);
+  const [pendingSearch, setPendingSearch] = useState("");
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({ open: false, message: "", severity: "success" });
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
     wordId: number | null;
@@ -62,15 +79,18 @@ const AdminDashboard: React.FC = () => {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      const [statsData, usersData, contentData] = await Promise.all([
-        adminService.getDashboardStats(),
-        adminService.getRecentUsers(),
-        adminService.getRecentContent(),
-      ]);
+      const [statsData, usersData, contentData, pendingWordsData] =
+        await Promise.all([
+          adminService.getDashboardStats(),
+          adminService.getRecentUsers(),
+          adminService.getRecentContent(),
+          wordService.getPendingWords(),
+        ]);
 
       setStats(statsData);
       setRecentUsers(usersData);
       setRecentContent(contentData);
+      setPendingWords(pendingWordsData);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
     } finally {
@@ -110,6 +130,58 @@ const AdminDashboard: React.FC = () => {
     navigate("/add");
   };
 
+  const handleApproveWord = async (wordId: number) => {
+    try {
+      await wordService.approveWord(wordId);
+      setPendingWords((prev) => prev.filter((word) => word.id !== wordId));
+      await refreshPendingCount(); // Refresh the global count
+      setSnackbar({
+        open: true,
+        message: "Word approved successfully",
+        severity: "success",
+      });
+    } catch (error) {
+      console.error("Error approving word:", error);
+      setSnackbar({
+        open: true,
+        message: "Error approving word",
+        severity: "error",
+      });
+    }
+  };
+
+  const handleRejectWord = async (wordId: number) => {
+    try {
+      await wordService.rejectWord(wordId);
+      setPendingWords((prev) => prev.filter((word) => word.id !== wordId));
+      await refreshPendingCount(); // Refresh the global count
+      setSnackbar({
+        open: true,
+        message: "Word rejected successfully",
+        severity: "success",
+      });
+    } catch (error) {
+      console.error("Error rejecting word:", error);
+      setSnackbar({
+        open: true,
+        message: "Error rejecting word",
+        severity: "error",
+      });
+    }
+  };
+
+  const filteredPendingWords = pendingWords.filter(
+    (word) =>
+      word.greek_word.toLowerCase().includes(pendingSearch.toLowerCase()) ||
+      word.meanings.some((m) =>
+        m.english_meaning.toLowerCase().includes(pendingSearch.toLowerCase())
+      ) ||
+      (word.submitter?.email
+        ?.toLowerCase()
+        .includes(pendingSearch.toLowerCase()) ??
+        false)
+  );
+
   if (!stats) {
     return (
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -141,6 +213,9 @@ const AdminDashboard: React.FC = () => {
       >
         <Typography variant="h4" component="h1" gutterBottom={false}>
           Admin Dashboard
+        </Typography>
+        <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+          Welcome, {user?.email}
         </Typography>
         <Button
           startIcon={<RefreshIcon />}
@@ -291,6 +366,141 @@ const AdminDashboard: React.FC = () => {
                 }}
               />
             </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Pending Words */}
+        <Grid size={{ xs: 12 }}>
+          <Card
+            sx={{
+              height: "100%",
+              borderRadius: 2,
+              transition: "all 0.2s",
+              "&:hover": {
+                boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
+              },
+            }}
+          >
+            <CardHeader
+              title="Pending Words"
+              action={
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<AddIcon />}
+                  onClick={handleAddWord}
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: "none",
+                    "&:hover": {
+                      backgroundColor: "rgba(37, 99, 235, 0.08)",
+                    },
+                  }}
+                >
+                  Add Word
+                </Button>
+              }
+            />
+            <Box sx={{ px: 2, pt: 1 }}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="Search pending words..."
+                value={pendingSearch}
+                onChange={(e) => setPendingSearch(e.target.value)}
+                sx={{ mb: 2 }}
+              />
+            </Box>
+            <List>
+              {filteredPendingWords.map((word) => (
+                <React.Fragment key={word.id}>
+                  <ListItem
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      py: 2,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: "100%",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                      }}
+                    >
+                      <Box>
+                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                          {word.greek_word}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ mt: 0.5 }}
+                        >
+                          Submitted by: {word.submitter?.email || "Unknown"} on{" "}
+                          {word.created_at
+                            ? new Date(word.created_at).toLocaleDateString()
+                            : "Unknown date"}
+                        </Typography>
+                        <Box sx={{ mt: 1 }}>
+                          <Typography variant="body2">
+                            <strong>Type:</strong> {word.word_type}
+                          </Typography>
+                          <Typography variant="body2">
+                            <strong>Gender:</strong> {word.gender || "N/A"}
+                          </Typography>
+                          <Typography variant="body2">
+                            <strong>Meanings:</strong>
+                          </Typography>
+                          <List dense>
+                            {word.meanings.map(
+                              (meaning: Meaning, idx: number) => (
+                                <ListItem key={idx} sx={{ py: 0 }}>
+                                  <ListItemText
+                                    primary={`${idx + 1}. ${
+                                      meaning.english_meaning
+                                    }`}
+                                  />
+                                </ListItem>
+                              )
+                            )}
+                          </List>
+                        </Box>
+                      </Box>
+                      <Box>
+                        <IconButton
+                          color="success"
+                          onClick={() => handleApproveWord(word.id)}
+                          sx={{ mr: 1 }}
+                        >
+                          <CheckIcon />
+                        </IconButton>
+                        <IconButton
+                          color="error"
+                          onClick={() => handleRejectWord(word.id)}
+                        >
+                          <CloseIcon />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                  </ListItem>
+                  {word.id < filteredPendingWords.length && <Divider />}
+                </React.Fragment>
+              ))}
+              {filteredPendingWords.length === 0 && (
+                <ListItem>
+                  <Typography
+                    variant="body1"
+                    color="text.secondary"
+                    sx={{ textAlign: "center", width: "100%" }}
+                  >
+                    No pending words
+                  </Typography>
+                </ListItem>
+              )}
+            </List>
           </Card>
         </Grid>
 
@@ -527,7 +737,7 @@ const AdminDashboard: React.FC = () => {
         </Grid>
 
         {/* Quick Actions */}
-        <Grid size={12}>
+        <Grid size={{ xs: 12 }}>
           <Card
             sx={{
               borderRadius: 2,
@@ -623,6 +833,14 @@ const AdminDashboard: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        message={snackbar.message}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      />
     </Container>
   );
 };
