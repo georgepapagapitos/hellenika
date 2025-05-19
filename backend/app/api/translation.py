@@ -1,5 +1,6 @@
-from typing import Optional
 import logging
+from typing import Optional
+
 from app.core.translation import translate_to_english, translate_to_greek
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -24,7 +25,9 @@ async def translate_to_greek_endpoint(request: TranslationRequest):
         translated_text = await translate_to_greek(request.text)
         if translated_text is None:
             logger.error("Translation to Greek failed - no result returned")
-            raise HTTPException(status_code=500, detail="Translation failed - no result returned")
+            raise HTTPException(
+                status_code=500, detail="Translation failed - no result returned"
+            )
         logger.info(f"Translation to Greek successful: {translated_text}")
         return TranslationResponse(translated_text=translated_text)
     except Exception as e:
@@ -40,7 +43,9 @@ async def translate_to_english_endpoint(request: TranslationRequest):
         translated_text = await translate_to_english(request.text)
         if translated_text is None:
             logger.error("Translation to English failed - no result returned")
-            raise HTTPException(status_code=500, detail="Translation failed - no result returned")
+            raise HTTPException(
+                status_code=500, detail="Translation failed - no result returned"
+            )
         logger.info(f"Translation to English successful: {translated_text}")
         return TranslationResponse(translated_text=translated_text)
     except Exception as e:

@@ -1,7 +1,7 @@
 import uvicorn
-from app.api import translation, words, auth
+from app.api import admin, auth, translation, words
 from app.core.config import settings
-from app.db.database import engine, Base
+from app.db.database import Base, engine
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -22,9 +22,14 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(admin.router, prefix=f"{settings.API_V1_STR}/admin", tags=["admin"])
 app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"])
 app.include_router(words.router, prefix=f"{settings.API_V1_STR}/words", tags=["words"])
-app.include_router(translation.router, prefix=f"{settings.API_V1_STR}/translation", tags=["translation"])
+app.include_router(
+    translation.router,
+    prefix=f"{settings.API_V1_STR}/translation",
+    tags=["translation"],
+)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

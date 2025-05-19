@@ -1,4 +1,3 @@
-import os
 import logging
 from typing import Optional
 
@@ -39,7 +38,7 @@ async def translate_text(text: str, target_language: str) -> Optional[str]:
                 translated_text = data["data"]["translations"][0]["translatedText"]
                 logger.info(f"Translation successful: {translated_text}")
                 return translated_text
-            
+
             logger.error("No translation found in response")
             return None
     except httpx.HTTPError as e:

@@ -10,11 +10,11 @@ export const translateToGreek = async (
     const response = await axios.post(
       `${API_ENDPOINTS.translation}/to-greek`,
       { text },
-      { 
+      {
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        }
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
       }
     );
     console.log("Translation response:", response.data);
@@ -29,7 +29,7 @@ export const translateToGreek = async (
           url: error.config?.url,
           method: error.config?.method,
           headers: error.config?.headers,
-        }
+        },
       });
     } else {
       console.error("Error translating to Greek:", error);
@@ -47,11 +47,11 @@ export const translateToEnglish = async (
     const response = await axios.post(
       `${API_ENDPOINTS.translation}/to-english`,
       { text },
-      { 
+      {
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        }
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
       }
     );
     console.log("Translation response:", response.data);
@@ -66,7 +66,7 @@ export const translateToEnglish = async (
           url: error.config?.url,
           method: error.config?.method,
           headers: error.config?.headers,
-        }
+        },
       });
     } else {
       console.error("Error translating to English:", error);

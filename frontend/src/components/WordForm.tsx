@@ -25,7 +25,13 @@ import {
   Translate as TranslateIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { WordType, Gender, WordFormData, MeaningFormData, Word } from "../types";
+import {
+  WordType,
+  Gender,
+  WordFormData,
+  MeaningFormData,
+  Word,
+} from "../types";
 import { wordService } from "../services/wordService";
 import {
   translateToGreek,
@@ -129,7 +135,10 @@ const WordForm: React.FC<WordFormProps> = ({
     e.preventDefault();
     try {
       if (editWord && editWord.id !== undefined) {
-        const updatedWord = await wordService.updateWord(editWord.id as number, formData);
+        const updatedWord = await wordService.updateWord(
+          editWord.id as number,
+          formData
+        );
         onWordUpdated?.(updatedWord);
       } else {
         const newWord = await wordService.createWord(formData);
@@ -176,16 +185,16 @@ const WordForm: React.FC<WordFormProps> = ({
       if (englishText) {
         setFormData((prev) => {
           // Keep existing meanings but make them non-primary
-          const existingMeanings = prev.meanings.map(meaning => ({
+          const existingMeanings = prev.meanings.map((meaning) => ({
             ...meaning,
-            is_primary: false
+            is_primary: false,
           }));
-          
+
           const newMeanings = [
             { english_meaning: englishText, is_primary: true },
-            ...existingMeanings
+            ...existingMeanings,
           ];
-          
+
           return {
             ...prev,
             meanings: newMeanings,
@@ -200,30 +209,31 @@ const WordForm: React.FC<WordFormProps> = ({
   };
 
   return (
-    <Box 
-      sx={{ 
-        maxWidth: 800, 
-        mx: "auto", 
-        mt: { xs: 1, sm: 3 }, 
+    <Box
+      sx={{
+        maxWidth: 800,
+        mx: "auto",
+        mt: { xs: 1, sm: 3 },
         px: { xs: 2, sm: 0 },
-        pb: { xs: 3, sm: 4 }
+        pb: { xs: 3, sm: 4 },
       }}
     >
-      <Paper 
+      <Paper
         elevation={0}
-        sx={{ 
+        sx={{
           p: { xs: 2, sm: 3 },
           borderRadius: 3,
           backgroundColor: "background.paper",
           border: "1px solid",
           borderColor: "divider",
-          boxShadow: (theme) => `0 4px 20px ${alpha(theme.palette.primary.main, 0.08)}`,
+          boxShadow: (theme) =>
+            `0 4px 20px ${alpha(theme.palette.primary.main, 0.08)}`,
         }}
       >
-        <Typography 
-          variant="h4" 
-          gutterBottom 
-          sx={{ 
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={{
             mb: 3,
             fontWeight: 600,
             color: "primary.main",
@@ -236,12 +246,12 @@ const WordForm: React.FC<WordFormProps> = ({
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2}>
             <Grid size={12}>
-              <Box 
-                sx={{ 
-                  display: "flex", 
+              <Box
+                sx={{
+                  display: "flex",
                   flexDirection: { xs: "column", sm: "row" },
-                  gap: 1.5, 
-                  alignItems: { xs: "stretch", sm: "flex-start" } 
+                  gap: 1.5,
+                  alignItems: { xs: "stretch", sm: "flex-start" },
                 }}
               >
                 <TextField
@@ -289,7 +299,9 @@ const WordForm: React.FC<WordFormProps> = ({
                     transition: "all 0.2s ease-in-out",
                   }}
                 >
-                  {loading.translateToEnglish ? "Translating..." : "Greek → English"}
+                  {loading.translateToEnglish
+                    ? "Translating..."
+                    : "Greek → English"}
                 </Button>
               </Box>
             </Grid>
@@ -325,7 +337,8 @@ const WordForm: React.FC<WordFormProps> = ({
               </FormControl>
             </Grid>
 
-            {(formData.word_type === WordType.NOUN || formData.word_type === WordType.ARTICLE) && (
+            {(formData.word_type === WordType.NOUN ||
+              formData.word_type === WordType.ARTICLE) && (
               <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl fullWidth>
                   <InputLabel>Gender</InputLabel>
@@ -359,10 +372,10 @@ const WordForm: React.FC<WordFormProps> = ({
             )}
 
             <Grid size={12}>
-              <Typography 
-                variant="h6" 
-                gutterBottom 
-                sx={{ 
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{
                   mt: 1,
                   mb: 2,
                   fontWeight: 600,
@@ -388,7 +401,11 @@ const WordForm: React.FC<WordFormProps> = ({
                         backgroundColor: alpha("#f8fafc", 0.8),
                         borderColor: "primary.main",
                         transform: "translateY(-1px)",
-                        boxShadow: (theme) => `0 4px 12px ${alpha(theme.palette.primary.main, 0.08)}`,
+                        boxShadow: (theme) =>
+                          `0 4px 12px ${alpha(
+                            theme.palette.primary.main,
+                            0.08
+                          )}`,
                       },
                       position: "relative",
                     }}
@@ -425,12 +442,12 @@ const WordForm: React.FC<WordFormProps> = ({
                     )}
                     <ListItemText
                       primary={
-                        <Box 
-                          sx={{ 
-                            display: "flex", 
+                        <Box
+                          sx={{
+                            display: "flex",
                             flexDirection: { xs: "column", sm: "row" },
-                            gap: 1.5, 
-                            alignItems: { xs: "stretch", sm: "flex-start" } 
+                            gap: 1.5,
+                            alignItems: { xs: "stretch", sm: "flex-start" },
                           }}
                         >
                           <TextField
@@ -452,9 +469,10 @@ const WordForm: React.FC<WordFormProps> = ({
                                 "&:hover .MuiOutlinedInput-notchedOutline": {
                                   borderColor: "primary.main",
                                 },
-                                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                                  borderWidth: 2,
-                                },
+                                "&.Mui-focused .MuiOutlinedInput-notchedOutline":
+                                  {
+                                    borderWidth: 2,
+                                  },
                               },
                               "& .MuiInputLabel-root": {
                                 "&.Mui-focused": {
@@ -465,8 +483,16 @@ const WordForm: React.FC<WordFormProps> = ({
                           />
                           {meaning.is_primary && (
                             <Button
-                              onClick={() => handleTranslateToGreek(meaning.english_meaning, index)}
-                              disabled={loading.translateToGreek || !meaning.english_meaning}
+                              onClick={() =>
+                                handleTranslateToGreek(
+                                  meaning.english_meaning,
+                                  index
+                                )
+                              }
+                              disabled={
+                                loading.translateToGreek ||
+                                !meaning.english_meaning
+                              }
                               variant="contained"
                               color="primary"
                               startIcon={<TranslateIcon />}
@@ -484,7 +510,9 @@ const WordForm: React.FC<WordFormProps> = ({
                                 transition: "all 0.2s ease-in-out",
                               }}
                             >
-                              {loading.translateToGreek ? "Translating..." : "English → Greek"}
+                              {loading.translateToGreek
+                                ? "Translating..."
+                                : "English → Greek"}
                             </Button>
                           )}
                         </Box>
@@ -505,7 +533,7 @@ const WordForm: React.FC<WordFormProps> = ({
                             />
                           }
                           label="Primary Meaning"
-                          sx={{ 
+                          sx={{
                             mt: 0.5,
                             "& .MuiFormControlLabel-label": {
                               fontSize: "0.875rem",

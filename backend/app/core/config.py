@@ -26,7 +26,10 @@ class Settings(BaseSettings):
     GOOGLE_TRANSLATE_API_KEY: str = ""
 
     # CORS
-    CORS_ORIGINS: List[str] = ["http://localhost:3000"]  # Default for development
+    CORS_ORIGINS: List[str] = [
+        "http://localhost:3000",
+        "http://localhost:8000",
+    ]  # Default for development
 
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:

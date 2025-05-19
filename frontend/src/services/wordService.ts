@@ -2,7 +2,6 @@ import axios from "axios";
 import { API_ENDPOINTS } from "../config";
 import { Word, WordFormData, WordType, Gender } from "../types";
 
-
 // Create a dedicated API client
 const createApiClient = () => {
   return axios.create({
@@ -34,7 +33,7 @@ class WordService {
   private token: string | null = null;
 
   constructor() {
-    this.token = localStorage.getItem('token');
+    this.token = localStorage.getItem("token");
   }
 
   private getHeaders() {
@@ -51,9 +50,12 @@ class WordService {
     if (filters?.page) params.append("page", filters.page.toString());
     if (filters?.size) params.append("size", filters.size.toString());
 
-    const response = await api.get<PaginatedResponse>(`${API_ENDPOINTS.words}?${params.toString()}`, {
-      headers: this.getHeaders(),
-    });
+    const response = await api.get<PaginatedResponse>(
+      `${API_ENDPOINTS.words}?${params.toString()}`,
+      {
+        headers: this.getHeaders(),
+      }
+    );
     return response.data;
   }
 

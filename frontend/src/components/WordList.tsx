@@ -357,12 +357,21 @@ const WordList = () => {
                     >
                       <TableCell>{word.greek_word}</TableCell>
                       <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          {word.meanings.find((m) => m.is_primary)?.english_meaning ||
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 0.5,
+                          }}
+                        >
+                          {word.meanings.find((m) => m.is_primary)
+                            ?.english_meaning ||
                             word.meanings[0]?.english_meaning}
                           {word.meanings.length > 1 && (
-                            <Tooltip 
-                              title={`${word.meanings.length - 1} more meaning${word.meanings.length > 2 ? 's' : ''}`}
+                            <Tooltip
+                              title={`${word.meanings.length - 1} more meaning${
+                                word.meanings.length > 2 ? "s" : ""
+                              }`}
                               arrow
                               placement="top"
                             >
@@ -374,16 +383,16 @@ const WordList = () => {
                                 }}
                                 sx={{
                                   ml: 0.5,
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  color: 'primary.main',
-                                  cursor: 'pointer',
-                                  fontSize: '0.75rem',
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  color: "primary.main",
+                                  cursor: "pointer",
+                                  fontSize: "0.75rem",
                                   fontWeight: 500,
                                   opacity: 0.8,
-                                  '&:hover': {
+                                  "&:hover": {
                                     opacity: 1,
-                                    textDecoration: 'underline',
+                                    textDecoration: "underline",
                                   },
                                 }}
                               >

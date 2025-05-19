@@ -14,7 +14,10 @@ interface LoginFormProps {
   onRegisterClick: () => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onRegisterClick }) => {
+const LoginForm: React.FC<LoginFormProps> = ({
+  onSuccess,
+  onRegisterClick,
+}) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string>("");
@@ -116,4 +119,4 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onRegisterClick }) => 
   );
 };
 
-export default LoginForm; 
+export default LoginForm;

@@ -29,19 +29,23 @@ class AuthService {
   private token: string | null = null;
 
   constructor() {
-    this.token = localStorage.getItem('token');
+    this.token = localStorage.getItem("token");
   }
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const params = new URLSearchParams();
-    params.append('username', credentials.email);
-    params.append('password', credentials.password);
+    params.append("username", credentials.email);
+    params.append("password", credentials.password);
 
-    const response = await api.post<AuthResponse>(API_ENDPOINTS.auth.token, params, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    });
+    const response = await api.post<AuthResponse>(
+      API_ENDPOINTS.auth.token,
+      params,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
     this.setToken(response.data.access_token);
     return response.data;
   }
@@ -57,7 +61,7 @@ class AuthService {
 
   logout(): void {
     this.token = null;
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
   }
 
   isAuthenticated(): boolean {
@@ -70,12 +74,12 @@ class AuthService {
 
   private setToken(token: string): void {
     this.token = token;
-    localStorage.setItem('token', token);
+    localStorage.setItem("token", token);
   }
 
   async getCurrentUser(): Promise<User> {
     if (!this.token) {
-      throw new Error('No token found');
+      throw new Error("No token found");
     }
     const response = await api.get<User>(API_ENDPOINTS.auth.me, {
       headers: {
@@ -86,4 +90,4 @@ class AuthService {
   }
 }
 
-export const authService = new AuthService(); 
+export const authService = new AuthService();

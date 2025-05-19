@@ -1,71 +1,104 @@
-import React, { useState } from 'react';
 import {
+  Add as AddIcon,
+  Analytics as AnalyticsIcon,
+  ContentPaste as ContentIcon,
+  Delete as DeleteIcon,
+  Edit as EditIcon,
+  People as PeopleIcon,
+  Refresh as RefreshIcon,
+  Settings as SettingsIcon,
+} from "@mui/icons-material";
+import {
+  Avatar,
   Box,
-  Container,
-  Typography,
-  Paper,
-  Grid,
+  Button,
   Card,
   CardContent,
   CardHeader,
-  useTheme,
+  Chip,
+  CircularProgress,
+  Container,
+  Divider,
+  Grid,
   IconButton,
-  Button,
+  LinearProgress,
   List,
   ListItem,
   ListItemSecondaryAction,
-  Divider,
-  Chip,
-  Avatar,
-  LinearProgress,
-} from '@mui/material';
+  Paper,
+  Typography,
+  useTheme,
+} from "@mui/material";
+import React, { useEffect, useState } from "react";
 import {
-  People as PeopleIcon,
-  ContentPaste as ContentIcon,
-  Settings as SettingsIcon,
-  Analytics as AnalyticsIcon,
-  Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Refresh as RefreshIcon,
-} from '@mui/icons-material';
-import { useAuth } from '../contexts/AuthContext';
+  adminService,
+  DashboardStats,
+  RecentContent,
+  RecentUser,
+} from "../services/adminService";
 
 const AdminDashboard: React.FC = () => {
   const theme = useTheme();
-  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
+  const [recentContent, setRecentContent] = useState<RecentContent[]>([]);
 
-  // Mock data - replace with actual API calls
-  const stats = {
-    totalUsers: 150,
-    activeUsers: 120,
-    totalContent: 500,
-    userGrowth: 15,
-    contentGrowth: 25,
+  const fetchDashboardData = async () => {
+    setLoading(true);
+    try {
+      const [statsData, usersData, contentData] = await Promise.all([
+        adminService.getDashboardStats(),
+        adminService.getRecentUsers(),
+        adminService.getRecentContent(),
+      ]);
+
+      setStats(statsData);
+      setRecentUsers(usersData);
+      setRecentContent(contentData);
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+      // You might want to show an error message to the user here
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const recentUsers = [
-    { id: 1, name: 'John Doe', email: 'john@example.com', joined: '2 days ago', status: 'active' },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', joined: '3 days ago', status: 'active' },
-    { id: 3, name: 'Bob Johnson', email: 'bob@example.com', joined: '5 days ago', status: 'inactive' },
-  ];
-
-  const recentContent = [
-    { id: 1, title: 'Basic Verbs', type: 'Lesson', created: '1 day ago', status: 'published' },
-    { id: 2, title: 'Common Phrases', type: 'Exercise', created: '2 days ago', status: 'draft' },
-    { id: 3, title: 'Grammar Rules', type: 'Quiz', created: '3 days ago', status: 'published' },
-  ];
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
   const handleRefresh = () => {
-    setLoading(true);
-    // Simulate API call
-    setTimeout(() => setLoading(false), 1000);
+    fetchDashboardData();
   };
+
+  if (!stats) {
+    return (
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "50vh",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
         <Typography variant="h4" component="h1" gutterBottom>
           Admin Dashboard
         </Typography>
@@ -78,42 +111,25 @@ const AdminDashboard: React.FC = () => {
           Refresh
         </Button>
       </Box>
-      
-      <Grid container spacing={3}>
-        {/* Welcome Card */}
-        <Grid size={12}>
-          <Paper
-            sx={{
-              p: 3,
-              display: 'flex',
-              flexDirection: 'column',
-              background: theme.palette.primary.main,
-              color: theme.palette.primary.contrastText,
-              borderRadius: 2,
-            }}
-          >
-            <Typography variant="h5" gutterBottom>
-              Welcome back, {user?.email}!
-            </Typography>
-            <Typography variant="body1">
-              Here's what's happening with your application today.
-            </Typography>
-          </Paper>
-        </Grid>
 
+      <Grid container spacing={3}>
         {/* Stats Cards */}
         <Grid size={4}>
-          <Card sx={{ height: '100%', borderRadius: 2 }}>
-            <CardHeader 
-              title="Total Users" 
-              avatar={<Avatar sx={{ bgcolor: theme.palette.primary.main }}><PeopleIcon /></Avatar>}
+          <Card sx={{ height: "100%", borderRadius: 2 }}>
+            <CardHeader
+              title="Total Users"
+              avatar={
+                <Avatar sx={{ bgcolor: theme.palette.primary.main }}>
+                  <PeopleIcon />
+                </Avatar>
+              }
             />
             <CardContent>
               <Typography variant="h3" color="primary" gutterBottom>
-                {stats.totalUsers}
+                {stats.total_users}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {stats.userGrowth}% growth this month
+                {stats.user_growth}% growth this month
               </Typography>
               <LinearProgress variant="determinate" value={75} sx={{ mt: 2 }} />
             </CardContent>
@@ -121,17 +137,22 @@ const AdminDashboard: React.FC = () => {
         </Grid>
 
         <Grid size={4}>
-          <Card sx={{ height: '100%', borderRadius: 2 }}>
-            <CardHeader 
-              title="Active Users" 
-              avatar={<Avatar sx={{ bgcolor: theme.palette.success.main }}><PeopleIcon /></Avatar>}
+          <Card sx={{ height: "100%", borderRadius: 2 }}>
+            <CardHeader
+              title="Active Users"
+              avatar={
+                <Avatar sx={{ bgcolor: theme.palette.success.main }}>
+                  <PeopleIcon />
+                </Avatar>
+              }
             />
             <CardContent>
               <Typography variant="h3" color="success.main" gutterBottom>
-                {stats.activeUsers}
+                {stats.active_users}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {Math.round((stats.activeUsers / stats.totalUsers) * 100)}% of total users
+                {Math.round((stats.active_users / stats.total_users) * 100)}% of
+                total users
               </Typography>
               <LinearProgress variant="determinate" value={80} sx={{ mt: 2 }} />
             </CardContent>
@@ -139,17 +160,21 @@ const AdminDashboard: React.FC = () => {
         </Grid>
 
         <Grid size={4}>
-          <Card sx={{ height: '100%', borderRadius: 2 }}>
-            <CardHeader 
-              title="Total Content" 
-              avatar={<Avatar sx={{ bgcolor: theme.palette.info.main }}><ContentIcon /></Avatar>}
+          <Card sx={{ height: "100%", borderRadius: 2 }}>
+            <CardHeader
+              title="Total Content"
+              avatar={
+                <Avatar sx={{ bgcolor: theme.palette.info.main }}>
+                  <ContentIcon />
+                </Avatar>
+              }
             />
             <CardContent>
               <Typography variant="h3" color="info.main" gutterBottom>
-                {stats.totalContent}
+                {stats.total_content}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {stats.contentGrowth}% growth this month
+                {stats.content_growth}% growth this month
               </Typography>
               <LinearProgress variant="determinate" value={60} sx={{ mt: 2 }} />
             </CardContent>
@@ -158,15 +183,11 @@ const AdminDashboard: React.FC = () => {
 
         {/* Recent Users */}
         <Grid size={6}>
-          <Card sx={{ height: '100%', borderRadius: 2 }}>
-            <CardHeader 
+          <Card sx={{ height: "100%", borderRadius: 2 }}>
+            <CardHeader
               title="Recent Users"
               action={
-                <Button
-                  variant="outlined"
-                  size="small"
-                  startIcon={<AddIcon />}
-                >
+                <Button variant="outlined" size="small" startIcon={<AddIcon />}>
                   Add User
                 </Button>
               }
@@ -176,28 +197,41 @@ const AdminDashboard: React.FC = () => {
                 <React.Fragment key={user.id}>
                   <ListItem>
                     <Box sx={{ flex: 1 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 0.5 }}
+                      >
                         <Typography variant="subtitle1" component="span">
                           {user.name}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary" component="span" sx={{ ml: 1 }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          component="span"
+                          sx={{ ml: 1 }}
+                        >
                           {user.email}
                         </Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Typography variant="body2" color="text.secondary" component="span">
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          component="span"
+                        >
                           Joined {user.joined}
                         </Typography>
-                        <Chip 
+                        <Chip
                           size="small"
                           label={user.status}
-                          color={user.status === 'active' ? 'success' : 'default'}
+                          color={
+                            user.status === "active" ? "success" : "default"
+                          }
                           sx={{ ml: 1 }}
                         />
                       </Box>
                     </Box>
                     <ListItemSecondaryAction>
-                      <Box sx={{ display: 'flex', gap: 1 }}>
+                      <Box sx={{ display: "flex", gap: 1 }}>
                         <IconButton size="small">
                           <EditIcon />
                         </IconButton>
@@ -216,15 +250,11 @@ const AdminDashboard: React.FC = () => {
 
         {/* Recent Content */}
         <Grid size={6}>
-          <Card sx={{ height: '100%', borderRadius: 2 }}>
-            <CardHeader 
+          <Card sx={{ height: "100%", borderRadius: 2 }}>
+            <CardHeader
               title="Recent Content"
               action={
-                <Button
-                  variant="outlined"
-                  size="small"
-                  startIcon={<AddIcon />}
-                >
+                <Button variant="outlined" size="small" startIcon={<AddIcon />}>
                   Add Content
                 </Button>
               }
@@ -234,28 +264,43 @@ const AdminDashboard: React.FC = () => {
                 <React.Fragment key={content.id}>
                   <ListItem>
                     <Box sx={{ flex: 1 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 0.5 }}
+                      >
                         <Typography variant="subtitle1" component="span">
                           {content.title}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary" component="span" sx={{ ml: 1 }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          component="span"
+                          sx={{ ml: 1 }}
+                        >
                           {content.type}
                         </Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Typography variant="body2" color="text.secondary" component="span">
+                      <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          component="span"
+                        >
                           Created {content.created}
                         </Typography>
-                        <Chip 
+                        <Chip
                           size="small"
                           label={content.status}
-                          color={content.status === 'published' ? 'success' : 'default'}
+                          color={
+                            content.status === "published"
+                              ? "success"
+                              : "default"
+                          }
                           sx={{ ml: 1 }}
                         />
                       </Box>
                     </Box>
                     <ListItemSecondaryAction>
-                      <Box sx={{ display: 'flex', gap: 1 }}>
+                      <Box sx={{ display: "flex", gap: 1 }}>
                         <IconButton size="small">
                           <EditIcon />
                         </IconButton>
@@ -282,17 +327,23 @@ const AdminDashboard: React.FC = () => {
                   <Paper
                     sx={{
                       p: 2,
-                      textAlign: 'center',
-                      cursor: 'pointer',
+                      textAlign: "center",
+                      cursor: "pointer",
                       borderRadius: 2,
-                      transition: 'all 0.2s',
-                      '&:hover': {
+                      transition: "all 0.2s",
+                      "&:hover": {
                         backgroundColor: theme.palette.action.hover,
-                        transform: 'translateY(-2px)',
+                        transform: "translateY(-2px)",
                       },
                     }}
                   >
-                    <PeopleIcon sx={{ fontSize: 40, color: theme.palette.primary.main, mb: 1 }} />
+                    <PeopleIcon
+                      sx={{
+                        fontSize: 40,
+                        color: theme.palette.primary.main,
+                        mb: 1,
+                      }}
+                    />
                     <Typography variant="subtitle1">Manage Users</Typography>
                   </Paper>
                 </Grid>
@@ -300,35 +351,49 @@ const AdminDashboard: React.FC = () => {
                   <Paper
                     sx={{
                       p: 2,
-                      textAlign: 'center',
-                      cursor: 'pointer',
+                      textAlign: "center",
+                      cursor: "pointer",
                       borderRadius: 2,
-                      transition: 'all 0.2s',
-                      '&:hover': {
+                      transition: "all 0.2s",
+                      "&:hover": {
                         backgroundColor: theme.palette.action.hover,
-                        transform: 'translateY(-2px)',
+                        transform: "translateY(-2px)",
                       },
                     }}
                   >
-                    <ContentIcon sx={{ fontSize: 40, color: theme.palette.info.main, mb: 1 }} />
-                    <Typography variant="subtitle1">Content Management</Typography>
+                    <ContentIcon
+                      sx={{
+                        fontSize: 40,
+                        color: theme.palette.info.main,
+                        mb: 1,
+                      }}
+                    />
+                    <Typography variant="subtitle1">
+                      Content Management
+                    </Typography>
                   </Paper>
                 </Grid>
                 <Grid size={3}>
                   <Paper
                     sx={{
                       p: 2,
-                      textAlign: 'center',
-                      cursor: 'pointer',
+                      textAlign: "center",
+                      cursor: "pointer",
                       borderRadius: 2,
-                      transition: 'all 0.2s',
-                      '&:hover': {
+                      transition: "all 0.2s",
+                      "&:hover": {
                         backgroundColor: theme.palette.action.hover,
-                        transform: 'translateY(-2px)',
+                        transform: "translateY(-2px)",
                       },
                     }}
                   >
-                    <SettingsIcon sx={{ fontSize: 40, color: theme.palette.warning.main, mb: 1 }} />
+                    <SettingsIcon
+                      sx={{
+                        fontSize: 40,
+                        color: theme.palette.warning.main,
+                        mb: 1,
+                      }}
+                    />
                     <Typography variant="subtitle1">System Settings</Typography>
                   </Paper>
                 </Grid>
@@ -336,17 +401,23 @@ const AdminDashboard: React.FC = () => {
                   <Paper
                     sx={{
                       p: 2,
-                      textAlign: 'center',
-                      cursor: 'pointer',
+                      textAlign: "center",
+                      cursor: "pointer",
                       borderRadius: 2,
-                      transition: 'all 0.2s',
-                      '&:hover': {
+                      transition: "all 0.2s",
+                      "&:hover": {
                         backgroundColor: theme.palette.action.hover,
-                        transform: 'translateY(-2px)',
+                        transform: "translateY(-2px)",
                       },
                     }}
                   >
-                    <AnalyticsIcon sx={{ fontSize: 40, color: theme.palette.success.main, mb: 1 }} />
+                    <AnalyticsIcon
+                      sx={{
+                        fontSize: 40,
+                        color: theme.palette.success.main,
+                        mb: 1,
+                      }}
+                    />
                     <Typography variant="subtitle1">Analytics</Typography>
                   </Paper>
                 </Grid>
@@ -359,4 +430,4 @@ const AdminDashboard: React.FC = () => {
   );
 };
 
-export default AdminDashboard; 
+export default AdminDashboard;

@@ -1,8 +1,9 @@
+from datetime import datetime
 from enum import Enum
-from sqlalchemy import String
-from sqlalchemy.orm import relationship
+
 from app.db.database import Base
-from sqlalchemy import Column, Integer
+from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy.orm import relationship
 
 
 class WordType(str, Enum):
@@ -30,6 +31,7 @@ class Word(Base):
     word_type = Column(String)
     gender = Column(String, nullable=True)
     notes = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
     meanings = relationship(
         "Meaning", back_populates="word", cascade="all, delete-orphan"
-    ) 
+    )

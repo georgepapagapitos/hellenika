@@ -1,17 +1,31 @@
-import React from "react";
-import { ThemeProvider, CssBaseline, Box, Container } from "@mui/material";
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from "react-router-dom";
-import { AppBar, Toolbar, Typography, Button, IconButton } from "@mui/material";
 import { School as SchoolIcon } from "@mui/icons-material";
-import theme from "./theme";
-import WordList from "./components/WordList";
-import Flashcards from "./components/Flashcards";
-import WordForm from "./components/WordForm";
-import AuthPage from "./pages/AuthPage";
-import ProtectedRoute from "./components/ProtectedRoute";
-import AdminRoute from "./components/AdminRoute";
+import {
+  AppBar,
+  Box,
+  Button,
+  Container,
+  CssBaseline,
+  IconButton,
+  ThemeProvider,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+import {
+  Link,
+  Route,
+  BrowserRouter as Router,
+  Routes,
+  useNavigate,
+} from "react-router-dom";
 import AdminDashboard from "./components/AdminDashboard";
+import AdminRoute from "./components/AdminRoute";
+import Flashcards from "./components/Flashcards";
+import ProtectedRoute from "./components/ProtectedRoute";
+import WordForm from "./components/WordForm";
+import WordList from "./components/WordList";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import AuthPage from "./pages/AuthPage";
+import theme from "./theme";
 
 const Navigation = () => {
   const { isAuthenticated, logout, user } = useAuth();
@@ -19,7 +33,7 @@ const Navigation = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/auth');
+    navigate("/auth");
   };
 
   return (
@@ -71,7 +85,7 @@ const Navigation = () => {
             >
               Flashcards
             </Button>
-            {user?.role === 'admin' && (
+            {user?.role === "admin" && (
               <Button
                 component={Link}
                 to="/admin"
@@ -102,7 +116,11 @@ const App = () => {
       <AuthProvider>
         <Router>
           <Box
-            sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              minHeight: "100vh",
+            }}
           >
             <Navigation />
 
@@ -165,7 +183,11 @@ const App = () => {
               }}
             >
               <Container maxWidth="lg">
-                <Typography variant="body2" color="text.secondary" align="center">
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  align="center"
+                >
                   © {new Date().getFullYear()} Hellenika. All rights reserved.
                 </Typography>
               </Container>

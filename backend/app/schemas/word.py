@@ -37,4 +37,4 @@ class Word(WordBase):
     meanings: List[Meaning]
 
     class Config:
-        from_attributes = True 
+        from_attributes = True

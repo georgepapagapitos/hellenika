@@ -10,4 +10,5 @@ export const API_ENDPOINTS = {
     register: `${API_URL}/auth/register`,
     me: `${API_URL}/auth/users/me`,
   },
+  admin: `${API_URL}/admin`,
 } as const;
