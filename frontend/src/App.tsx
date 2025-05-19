@@ -8,6 +8,7 @@ import {
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import AdminDashboard from "./components/AdminDashboard";
 import AdminRoute from "./components/AdminRoute";
+import EditWord from "./components/EditWord";
 import Flashcards from "./components/Flashcards";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -56,6 +57,14 @@ const App = () => {
                     element={
                       <ProtectedRoute>
                         <WordForm onWordAdded={() => {}} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/edit/:id"
+                    element={
+                      <ProtectedRoute>
+                        <EditWord />
                       </ProtectedRoute>
                     }
                   />

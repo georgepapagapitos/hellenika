@@ -1,6 +1,6 @@
 import axios from "axios";
 import { API_ENDPOINTS } from "../config";
-import { Word, WordFormData, WordType, Gender } from "../types";
+import { Gender, Word, WordFormData, WordType } from "../types";
 
 // Create a dedicated API client
 const createApiClient = () => {
@@ -77,6 +77,13 @@ class WordService {
     await api.delete(`${API_ENDPOINTS.words}/${id}`, {
       headers: this.getHeaders(),
     });
+  }
+
+  async getWordById(id: number): Promise<Word> {
+    const response = await api.get<Word>(`${API_ENDPOINTS.words}/${id}`, {
+      headers: this.getHeaders(),
+    });
+    return response.data;
   }
 }
 

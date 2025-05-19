@@ -1,48 +1,49 @@
-import React, { useEffect, useState, useCallback } from "react";
+import CloseIcon from "@mui/icons-material/Close";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import SearchIcon from "@mui/icons-material/Search";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import {
+  alpha,
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Divider,
+  FormControl,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  List,
+  ListItem,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Pagination,
+  Paper,
+  Select,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
-  Typography,
-  Chip,
-  IconButton,
-  Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
-  List,
-  ListItem,
-  ListItemText,
-  Divider,
-  alpha,
   TextField,
-  InputAdornment,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-  Pagination,
-  CircularProgress,
-  Menu,
   Tooltip,
+  Typography,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import CloseIcon from "@mui/icons-material/Close";
-import SearchIcon from "@mui/icons-material/Search";
-import { Word, WordType, Gender } from "../types";
-import { wordService } from "../services/wordService";
-import WordForm from "./WordForm";
+import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { wordService } from "../services/wordService";
+import { Gender, Word, WordType } from "../types";
+import WordForm from "./WordForm";
 
 const WordList = () => {
   const { user } = useAuth();
@@ -78,6 +79,7 @@ const WordList = () => {
     anchorEl: null,
     wordId: null,
   });
+  const navigate = useNavigate();
 
   const fetchWords = useCallback(async () => {
     try {
@@ -169,6 +171,12 @@ const WordList = () => {
       anchorEl: null,
       wordId: null,
     });
+  };
+
+  const handleEditWord = (word: Word) => {
+    if (word.id !== undefined) {
+      navigate(`/edit/${word.id}`);
+    }
   };
 
   const getWordTypeColor = (type: WordType) => {
@@ -505,7 +513,7 @@ const WordList = () => {
               onClick={() => {
                 const word = words.find((w) => w.id === actionMenu.wordId);
                 if (word) {
-                  setEditingWord(word);
+                  handleEditWord(word);
                 }
                 handleMenuClose();
               }}

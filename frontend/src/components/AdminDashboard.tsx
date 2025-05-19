@@ -18,6 +18,11 @@ import {
   Chip,
   CircularProgress,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider,
   Grid,
   IconButton,
@@ -28,24 +33,31 @@ import {
   Paper,
   Typography,
   useTheme,
-  useMediaQuery,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   adminService,
   DashboardStats,
   RecentContent,
   RecentUser,
 } from "../services/adminService";
+import { wordService } from "../services/wordService";
 
 const AdminDashboard: React.FC = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
   const [recentContent, setRecentContent] = useState<RecentContent[]>([]);
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    wordId: number | null;
+  }>({
+    open: false,
+    wordId: null,
+  });
 
   const fetchDashboardData = async () => {
     setLoading(true);
@@ -72,6 +84,30 @@ const AdminDashboard: React.FC = () => {
 
   const handleRefresh = () => {
     fetchDashboardData();
+  };
+
+  const handleEditWord = (content: RecentContent) => {
+    navigate(`/edit/${content.id}`);
+  };
+
+  const handleDeleteWord = (id: number) => {
+    setDeleteDialog({ open: true, wordId: id });
+  };
+
+  const confirmDelete = async () => {
+    if (deleteDialog.wordId) {
+      try {
+        await wordService.deleteWord(deleteDialog.wordId);
+        await fetchDashboardData(); // Refresh the data
+      } catch (error) {
+        console.error("Error deleting word:", error);
+      }
+    }
+    setDeleteDialog({ open: false, wordId: null });
+  };
+
+  const handleAddWord = () => {
+    navigate("/add");
   };
 
   if (!stats) {
@@ -277,6 +313,7 @@ const AdminDashboard: React.FC = () => {
                   variant="outlined"
                   size="small"
                   startIcon={<AddIcon />}
+                  onClick={() => navigate("/admin/users")}
                   sx={{
                     borderRadius: 2,
                     textTransform: "none",
@@ -390,6 +427,7 @@ const AdminDashboard: React.FC = () => {
                   variant="outlined"
                   size="small"
                   startIcon={<AddIcon />}
+                  onClick={handleAddWord}
                   sx={{
                     borderRadius: 2,
                     textTransform: "none",
@@ -398,7 +436,7 @@ const AdminDashboard: React.FC = () => {
                     },
                   }}
                 >
-                  Add Content
+                  Add Word
                 </Button>
               }
             />
@@ -457,6 +495,7 @@ const AdminDashboard: React.FC = () => {
                       <Box sx={{ display: "flex", gap: 1 }}>
                         <IconButton
                           size="small"
+                          onClick={() => handleEditWord(content)}
                           sx={{
                             "&:hover": {
                               backgroundColor: "rgba(37, 99, 235, 0.08)",
@@ -468,6 +507,7 @@ const AdminDashboard: React.FC = () => {
                         <IconButton
                           size="small"
                           color="error"
+                          onClick={() => handleDeleteWord(content.id)}
                           sx={{
                             "&:hover": {
                               backgroundColor: "rgba(239, 68, 68, 0.08)",
@@ -559,6 +599,30 @@ const AdminDashboard: React.FC = () => {
           </Card>
         </Grid>
       </Grid>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialog.open}
+        onClose={() => setDeleteDialog({ open: false, wordId: null })}
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this word? This action cannot be
+            undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setDeleteDialog({ open: false, wordId: null })}
+          >
+            Cancel
+          </Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
