@@ -1,113 +1,21 @@
-import { School as SchoolIcon } from "@mui/icons-material";
 import {
-  AppBar,
   Box,
-  Button,
   Container,
   CssBaseline,
-  IconButton,
   ThemeProvider,
-  Toolbar,
   Typography,
 } from "@mui/material";
-import {
-  Link,
-  Route,
-  BrowserRouter as Router,
-  Routes,
-  useNavigate,
-} from "react-router-dom";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import AdminDashboard from "./components/AdminDashboard";
 import AdminRoute from "./components/AdminRoute";
 import Flashcards from "./components/Flashcards";
+import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import WordForm from "./components/WordForm";
 import WordList from "./components/WordList";
-import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import AuthPage from "./pages/AuthPage";
 import theme from "./theme";
-
-const Navigation = () => {
-  const { isAuthenticated, logout, user } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/auth");
-  };
-
-  return (
-    <AppBar
-      position="sticky"
-      elevation={0}
-      sx={{
-        backgroundColor: "background.paper",
-        borderBottom: "1px solid",
-        borderColor: "divider",
-      }}
-    >
-      <Toolbar>
-        <IconButton
-          edge="start"
-          color="primary"
-          aria-label="menu"
-          sx={{ mr: 2 }}
-        >
-          <SchoolIcon />
-        </IconButton>
-        <Typography
-          variant="h6"
-          component={Link}
-          to="/"
-          sx={{
-            flexGrow: 1,
-            textDecoration: "none",
-            color: "primary.main",
-            fontWeight: 600,
-            letterSpacing: "-0.5px",
-          }}
-        >
-          Hellenika
-        </Typography>
-        {isAuthenticated ? (
-          <>
-            <Button component={Link} to="/" color="primary" sx={{ mx: 1 }}>
-              Word List
-            </Button>
-            <Button component={Link} to="/add" color="primary" sx={{ mx: 1 }}>
-              Add Word
-            </Button>
-            <Button
-              component={Link}
-              to="/flashcards"
-              color="primary"
-              sx={{ mx: 1 }}
-            >
-              Flashcards
-            </Button>
-            {user?.role === "admin" && (
-              <Button
-                component={Link}
-                to="/admin"
-                color="primary"
-                sx={{ mx: 1 }}
-              >
-                Admin Dashboard
-              </Button>
-            )}
-            <Button onClick={handleLogout} color="primary" sx={{ mx: 1 }}>
-              Logout
-            </Button>
-          </>
-        ) : (
-          <Button component={Link} to="/auth" color="primary" sx={{ mx: 1 }}>
-            Login
-          </Button>
-        )}
-      </Toolbar>
-    </AppBar>
-  );
-};
 
 const App = () => {
   return (
@@ -122,7 +30,7 @@ const App = () => {
               minHeight: "100vh",
             }}
           >
-            <Navigation />
+            <Navbar />
 
             <Box
               component="main"
