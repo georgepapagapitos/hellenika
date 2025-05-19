@@ -1,19 +1,19 @@
-import React, { useEffect, useState, useCallback } from "react";
+import { NavigateBefore, NavigateNext, Shuffle } from "@mui/icons-material";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import {
   Box,
+  Button,
   Card,
   CardContent,
-  Typography,
-  Button,
   IconButton,
-  useTheme,
+  Typography,
   useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import { NavigateNext, NavigateBefore, Shuffle } from "@mui/icons-material";
-import { Word, WordType } from "../types";
-import { wordService } from "../services/wordService";
-import RefreshIcon from "@mui/icons-material/Refresh";
 import { alpha } from "@mui/material/styles";
+import { useCallback, useEffect, useState } from "react";
+import { wordService } from "../services/wordService";
+import { Word, WordType } from "../types";
 
 const Flashcards = () => {
   const theme = useTheme();

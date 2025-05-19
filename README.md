@@ -2,23 +2,6 @@
 
 A Greek language learning application with a FastAPI backend and React frontend.
 
-## Project Structure
-
-```
-.
-├── backend/
-│   ├── app/
-│   │   ├── api/            # API endpoints
-│   │   ├── core/           # Core functionality (config, security)
-│   │   ├── db/            # Database setup
-│   │   ├── models/        # SQLAlchemy models
-│   │   └── main.py        # FastAPI application
-│   ├── venv/              # Python virtual environment
-│   ├── .env               # Environment variables (not in git)
-│   └── requirements.txt   # Python dependencies
-└── frontend/              # React frontend
-```
-
 ## Backend Setup
 
 ### Prerequisites
@@ -70,16 +53,16 @@ All endpoints are prefixed with `/api`:
 
 #### Words
 
-- `GET /api/words/` - List all words
-- `POST /api/words/` - Create a new word
-- `GET /api/words/{word_id}` - Get a specific word
-- `PUT /api/words/{word_id}` - Update a word
-- `POST /api/words/{word_id}/meanings/` - Add a meaning to a word
+- `GET /api/v1/words/` - List all words
+- `POST /api/v1/words/` - Create a new word
+- `GET /api/v1/words/{word_id}` - Get a specific word
+- `PUT /api/v1/words/{word_id}` - Update a word
+- `POST /api/v1/words/{word_id}/meanings/` - Add a meaning to a word
 
 Example request to create a word:
 
 ```json
-POST /api/words/
+POST /api/v1/words/
 {
   "greek_word": "γεια",
   "word_type": "noun",
@@ -126,13 +109,13 @@ Note: The Google Translate API is a paid service. You will be charged for usage 
 
 The application provides translation endpoints through the backend API:
 
-- `POST /api/translation/to-greek` - Translate text to Greek
-- `POST /api/translation/to-english` - Translate text to English
+- `POST /api/v1/translation/to-greek` - Translate text to Greek
+- `POST /api/v1/translation/to-english` - Translate text to English
 
 Example request to translate to Greek:
 
 ```json
-POST /api/translation/to-greek
+POST /api/v1/translation/to-greek
 {
   "text": "hello"
 }

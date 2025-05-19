@@ -28,8 +28,8 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
 import { useAdmin } from "../contexts/AdminContext";
+import { useAuth } from "../contexts/AuthContext";
 
 const Navbar = () => {
   const { isAuthenticated, logout, user } = useAuth();

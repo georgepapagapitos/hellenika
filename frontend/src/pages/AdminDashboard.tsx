@@ -50,7 +50,7 @@ import {
   RecentUser,
 } from "../services/adminService";
 import { wordService } from "../services/wordService";
-import { Word, Meaning } from "../types";
+import { Meaning, Word } from "../types";
 
 const AdminDashboard: React.FC = () => {
   const theme = useTheme();

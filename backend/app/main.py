@@ -30,6 +30,3 @@ app.include_router(
     prefix=f"{settings.API_V1_STR}/translation",
     tags=["translation"],
 )
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)

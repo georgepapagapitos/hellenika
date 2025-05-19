@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
 import { Box, Container } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import LoginForm from "../components/LoginForm";
 import RegisterForm from "../components/RegisterForm";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
 const AuthPage: React.FC = () => {

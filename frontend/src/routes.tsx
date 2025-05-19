@@ -1,15 +1,16 @@
 import { Box, Container, Typography } from "@mui/material";
 import { ReactElement } from "react";
 import { Route, Routes } from "react-router-dom";
-import AdminDashboard from "./components/AdminDashboard";
 import AdminRoute from "./components/AdminRoute";
-import EditWord from "./components/EditWord";
-import Flashcards from "./components/Flashcards";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
-import WordForm from "./components/WordForm";
-import WordList from "./components/WordList";
+import AdminDashboard from "./pages/AdminDashboard";
+import Flashcards from "./pages/Flashcards";
+import WordForm from "./pages/WordForm";
+
 import AuthPage from "./pages/AuthPage";
+import EditWord from "./pages/EditWord";
+import WordList from "./pages/WordList";
 
 const AppRoutes = (): ReactElement => {
   return (

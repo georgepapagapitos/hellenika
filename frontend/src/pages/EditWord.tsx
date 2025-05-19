@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import { Box, CircularProgress, Typography } from "@mui/material";
-import WordForm from "./WordForm";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import WordForm from "../pages/WordForm";
 import { wordService } from "../services/wordService";
 import { Word } from "../types";
 

@@ -71,7 +71,7 @@ const WordList = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const [pageSize, setPageSize] = useState(50);
+  const [pageSize, setPageSize] = useState(25);
   const [actionMenu, setActionMenu] = useState<{
     anchorEl: null | HTMLElement;
     wordId: number | null;

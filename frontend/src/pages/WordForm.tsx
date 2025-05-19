@@ -1,42 +1,42 @@
-import React, { useState, useEffect } from "react";
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Paper,
-  List,
-  ListItem,
-  ListItemText,
-  IconButton,
-  Switch,
-  FormControlLabel,
-  SelectChangeEvent,
-  alpha,
-} from "@mui/material";
-import Grid from "@mui/material/Grid";
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
   Translate as TranslateIcon,
 } from "@mui/icons-material";
+import {
+  Box,
+  Button,
+  FormControl,
+  FormControlLabel,
+  IconButton,
+  InputLabel,
+  List,
+  ListItem,
+  ListItemText,
+  MenuItem,
+  Paper,
+  Select,
+  SelectChangeEvent,
+  Switch,
+  TextField,
+  Typography,
+  alpha,
+} from "@mui/material";
+import Grid from "@mui/material/Grid";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  WordType,
-  Gender,
-  WordFormData,
-  MeaningFormData,
-  Word,
-} from "../types";
+  translateToEnglish,
+  translateToGreek,
+} from "../services/translationService";
 import { wordService } from "../services/wordService";
 import {
-  translateToGreek,
-  translateToEnglish,
-} from "../services/translationService";
+  Gender,
+  MeaningFormData,
+  Word,
+  WordFormData,
+  WordType,
+} from "../types";
 
 interface WordFormProps {
   onWordAdded: (word: Word) => void;
