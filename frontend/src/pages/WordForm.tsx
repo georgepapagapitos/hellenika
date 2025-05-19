@@ -1,9 +1,11 @@
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
+  Info as InfoIcon,
   Translate as TranslateIcon,
 } from "@mui/icons-material";
 import {
+  alpha,
   Box,
   Button,
   FormControl,
@@ -19,8 +21,8 @@ import {
   SelectChangeEvent,
   Switch,
   TextField,
+  Tooltip,
   Typography,
-  alpha,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import React, { useEffect, useState } from "react";
@@ -37,6 +39,41 @@ import {
   WordFormData,
   WordType,
 } from "../types";
+
+// Greek articles and their corresponding genders
+const GREEK_ARTICLES: Record<string, Gender> = {
+  // Definite articles
+  ο: Gender.MASCULINE,
+  η: Gender.FEMININE,
+  το: Gender.NEUTER,
+  οι: Gender.MASCULINE,
+  τα: Gender.NEUTER,
+  // Indefinite articles
+  ένας: Gender.MASCULINE,
+  μια: Gender.FEMININE,
+  ένα: Gender.NEUTER,
+};
+
+// Function to detect article and gender
+const detectArticleAndGender = (
+  word: string
+): { gender: Gender | null; wordWithoutArticle: string } => {
+  if (!word) return { gender: null, wordWithoutArticle: word };
+
+  const parts = word.trim().split(" ");
+  if (parts.length === 0) return { gender: null, wordWithoutArticle: word };
+
+  const firstWord = parts[0].toLowerCase();
+
+  if (firstWord in GREEK_ARTICLES) {
+    const detectedGender = GREEK_ARTICLES[firstWord];
+    return {
+      gender: detectedGender,
+      wordWithoutArticle: parts.slice(1).join(" "),
+    };
+  }
+  return { gender: null, wordWithoutArticle: word };
+};
 
 interface WordFormProps {
   onWordAdded: (word: Word) => void;
@@ -81,10 +118,20 @@ const WordForm: React.FC<WordFormProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+
+    if (name === "greek_word") {
+      const { gender, wordWithoutArticle } = detectArticleAndGender(value);
+      setFormData((prev) => ({
+        ...prev,
+        greek_word: value,
+        gender: gender || prev.gender,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSelectChange = (e: SelectChangeEvent) => {
@@ -164,9 +211,11 @@ const WordForm: React.FC<WordFormProps> = ({
     try {
       const greekText = await translateToGreek(englishText);
       if (greekText) {
+        const { gender } = detectArticleAndGender(greekText);
         setFormData((prev) => ({
           ...prev,
           greek_word: greekText,
+          gender: gender || prev.gender,
         }));
       }
     } catch (error) {
@@ -261,6 +310,22 @@ const WordForm: React.FC<WordFormProps> = ({
                   value={formData.greek_word}
                   onChange={handleChange}
                   required
+                  helperText={
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        color: "text.secondary",
+                      }}
+                    >
+                      <InfoIcon fontSize="small" />
+                      You can include the article (e.g., "η γάτα" or just
+                      "γάτα"). The gender will be automatically detected from
+                      the article.
+                    </Typography>
+                  }
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       borderRadius: 2,

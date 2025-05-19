@@ -752,18 +752,19 @@ const WordList = () => {
                         }
                         secondary={
                           meaning.is_primary && (
-                            <Chip
-                              label="Primary"
-                              size="small"
-                              color="primary"
-                              variant="outlined"
-                              sx={{
-                                mt: 0.5,
-                                "& .MuiChip-label": { px: 1 },
-                                borderColor: (theme) =>
-                                  alpha(theme.palette.primary.main, 0.5),
-                              }}
-                            />
+                            <Box sx={{ mt: 0.5 }}>
+                              <Chip
+                                label="Primary"
+                                size="small"
+                                color="primary"
+                                variant="outlined"
+                                sx={{
+                                  "& .MuiChip-label": { px: 1 },
+                                  borderColor: (theme) =>
+                                    alpha(theme.palette.primary.main, 0.5),
+                                }}
+                              />
+                            </Box>
                           )
                         }
                       />

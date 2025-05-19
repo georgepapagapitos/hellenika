@@ -6,7 +6,6 @@ export const translateToGreek = async (
   text: string
 ): Promise<string | null> => {
   try {
-    console.log("Translating to Greek:", text);
     const response = await axios.post(
       `${API_ENDPOINTS.translation}/to-greek`,
       { text },
@@ -17,7 +16,6 @@ export const translateToGreek = async (
         },
       }
     );
-    console.log("Translation response:", response.data);
     return response.data.translated_text;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -43,7 +41,6 @@ export const translateToEnglish = async (
   text: string
 ): Promise<string | null> => {
   try {
-    console.log("Translating to English:", text);
     const response = await axios.post(
       `${API_ENDPOINTS.translation}/to-english`,
       { text },
@@ -54,7 +51,6 @@ export const translateToEnglish = async (
         },
       }
     );
-    console.log("Translation response:", response.data);
     return response.data.translated_text;
   } catch (error) {
     if (axios.isAxiosError(error)) {
