@@ -30,7 +30,7 @@ POSTGRES_USER=hellenika
 POSTGRES_PASSWORD=your_secure_password
 POSTGRES_DB=hellenika_db
 SECRET_KEY=your_secure_secret_key
-CORS_ORIGINS=http://localhost:3000,http://localhost:8080,https://your.domain.com
+CORS_ORIGINS=http://localhost:3000,http://localhost:8090,https://your.domain.com
 ```
 
 Replace the placeholder values with secure passwords and your actual domain.
@@ -54,7 +54,7 @@ This will start:
    - Domain: your.domain.com
    - Scheme: http
    - Forward Hostname: hellenika-frontend (or your server's internal IP)
-   - Forward Port: 8080
+   - Forward Port: 8090
    - Enable SSL with Let's Encrypt
 
 ### 5. Access Your Application
