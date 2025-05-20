@@ -32,6 +32,8 @@ services:
     volumes:
       - ./backend:/app
       - backend_logs:/app/logs
+    ports:
+      - "8000:8000"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/openapi.json"]
       interval: 30s
