@@ -111,9 +111,7 @@ async def get_recent_content(
             id=word.id,
             title=word.greek_word,
             type="Word",
-            created=(
-                word.created_at.strftime("%Y-%m-%d") if word.created_at else "Unknown"
-            ),
+            created=word.created_at.strftime("%Y-%m-%d"),
             status="published",  # All words are considered published for now
         )
         for word in recent_words

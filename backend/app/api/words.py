@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Dict, List, Optional
 
 from app.api.auth_deps import get_current_admin_user, get_current_user
@@ -7,7 +8,6 @@ from app.models.user import User
 from app.models.word import ApprovalStatus
 from app.models.word import Word as DBWord
 from app.schemas.word import Word, WordCreate
-from app.utils.greek_utils import detect_article_and_gender
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
 from sqlalchemy import or_
@@ -31,11 +31,6 @@ def create_word(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    # Detect article and gender from the word
-    article, detected_gender, word_without_article = detect_article_and_gender(
-        word.greek_word
-    )
-
     # Convert enum values to lowercase for database compatibility
     word_type_value = (
         word.word_type.value
@@ -45,23 +40,20 @@ def create_word(
 
     # Use detected gender if available, otherwise use provided gender
     gender_value = (
-        detected_gender.value
-        if detected_gender
-        else (
-            word.gender.value
-            if word.gender and hasattr(word.gender, "value")
-            else str(word.gender).lower() if word.gender else None
-        )
+        word.gender.value
+        if word.gender and hasattr(word.gender, "value")
+        else str(word.gender).lower() if word.gender else None
     )
 
     # Create the word
     db_word = DBWord(
-        greek_word=word_without_article,  # Store word without article
+        greek_word=word.greek_word,
         word_type=word_type_value,
         gender=gender_value,
         notes=word.notes,
         approval_status=ApprovalStatus.PENDING,
         created_by=current_user.id,
+        created_at=datetime.utcnow(),
     )
     db.add(db_word)
     db.flush()  # Get the word ID without committing
