@@ -5,11 +5,10 @@ import AdminRoute from "./components/AdminRoute";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminDashboard from "./pages/AdminDashboard";
-import Flashcards from "./pages/Flashcards";
-import WordForm from "./pages/WordForm";
-
 import AuthPage from "./pages/AuthPage";
 import EditWord from "./pages/EditWord";
+import Flashcards from "./pages/Flashcards";
+import WordForm from "./pages/WordForm";
 import WordList from "./pages/WordList";
 
 const AppRoutes = (): ReactElement => {

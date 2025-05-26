@@ -5,6 +5,7 @@ import {
   Button,
   Card,
   CardContent,
+  Chip,
   IconButton,
   Typography,
   useMediaQuery,
@@ -14,6 +15,7 @@ import { alpha } from "@mui/material/styles";
 import { useCallback, useEffect, useState } from "react";
 import { wordService } from "../services/wordService";
 import { Word, WordType } from "../types";
+import { getGenderColor, getBorderColor } from "../utils/chipColors";
 
 const Flashcards = () => {
   const theme = useTheme();
@@ -79,14 +81,6 @@ const Flashcards = () => {
     setIsFlipped(!isFlipped);
   };
 
-  // Helper to get the article
-  function getGreekArticle(gender?: string): string {
-    if (gender === "feminine") return "η/μια";
-    if (gender === "masculine") return "ο/ένας";
-    if (gender === "neuter") return "το/ένα";
-    return "";
-  }
-
   if (words.length === 0) {
     return (
       <Box sx={{ p: { xs: 2, sm: 4 }, textAlign: "center" }}>
@@ -107,11 +101,7 @@ const Flashcards = () => {
 
   const currentWord = words[currentIndex];
 
-  // Compute display word
-  const displayWord =
-    currentWord.word_type === WordType.NOUN && currentWord.gender
-      ? `${getGreekArticle(currentWord.gender)} ${currentWord.greek_word}`
-      : currentWord.greek_word;
+  const displayWord = currentWord.greek_word;
 
   return (
     <Box
@@ -223,13 +213,43 @@ const Flashcards = () => {
             >
               {displayWord}
             </Typography>
-            <Typography
-              variant={isMobile ? "body1" : "subtitle1"}
-              color="text.secondary"
-              sx={{ textAlign: "center" }}
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1,
+                flexWrap: "wrap",
+                justifyContent: "center",
+              }}
             >
-              {currentWord.word_type}
-            </Typography>
+              <Typography
+                variant={isMobile ? "body1" : "subtitle1"}
+                color="text.secondary"
+                sx={{ textAlign: "center" }}
+              >
+                {currentWord.word_type}
+              </Typography>
+              {currentWord.word_type === WordType.NOUN &&
+                currentWord.gender && (
+                  <Chip
+                    label={currentWord.gender.toUpperCase()}
+                    size="small"
+                    sx={{
+                      fontWeight: 400,
+                      fontSize: "0.75rem",
+                      "& .MuiChip-label": {
+                        px: 1,
+                        fontWeight: 400,
+                      },
+                      backgroundColor: getGenderColor(currentWord.gender).bg,
+                      color: getGenderColor(currentWord.gender).text,
+                      border: "1px solid",
+                      borderColor: getBorderColor(
+                        getGenderColor(currentWord.gender).text
+                      ),
+                    }}
+                  />
+                )}
+            </Box>
           </CardContent>
 
           <CardContent

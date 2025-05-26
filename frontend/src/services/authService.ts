@@ -1,12 +1,5 @@
-import axios from "axios";
 import { API_ENDPOINTS } from "../config";
-
-// Create a dedicated API client
-const createApiClient = () => {
-  return axios.create();
-};
-
-const api = createApiClient();
+import { api } from "./apiClient";
 
 export interface User {
   id: number;
@@ -81,11 +74,7 @@ class AuthService {
     if (!this.token) {
       throw new Error("No token found");
     }
-    const response = await api.get<User>(API_ENDPOINTS.auth.me, {
-      headers: {
-        Authorization: `Bearer ${this.token}`,
-      },
-    });
+    const response = await api.get<User>(API_ENDPOINTS.auth.me);
     return response.data;
   }
 }

@@ -8,9 +8,6 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str = "Hellenika API"
 
-    # CORS settings
-    BACKEND_CORS_ORIGINS: List[str] = ["*"]  # Allow all origins for testing
-
     # Database settings
     POSTGRES_SERVER: str
     POSTGRES_USER: str
@@ -26,10 +23,7 @@ class Settings(BaseSettings):
     GOOGLE_TRANSLATE_API_KEY: str = ""
 
     # CORS
-    CORS_ORIGINS: List[str] = [
-        "http://localhost:3000",
-        "http://localhost:8000",
-    ]  # Default for development
+    CORS_ORIGINS: List[str] = ["http://localhost:3000"]
 
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:

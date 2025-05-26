@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 
 from app.db.database import Base
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy import Column, DateTime, ForeignKey, Identity, Integer, String
 from sqlalchemy.orm import relationship
 
 
@@ -32,7 +32,7 @@ class ApprovalStatus(str, Enum):
 class Word(Base):
     __tablename__ = "words"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, Identity(always=True), primary_key=True, index=True)
     greek_word = Column(String, index=True)
     word_type = Column(String)
     gender = Column(String, nullable=True)
