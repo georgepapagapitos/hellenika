@@ -124,9 +124,7 @@ def read_words(
 
 
 @router.get("/pending", response_model=List[Word])
-def get_pending_words(
-    db: Session = Depends(get_db), current_user: User = Depends(get_current_admin_user)
-):
+def get_pending_words(db: Session = Depends(get_db)):
     return (
         db.query(DBWord)
         .options(joinedload(DBWord.submitter))

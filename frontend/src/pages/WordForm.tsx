@@ -1,7 +1,6 @@
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
-  Info as InfoIcon,
   Translate as TranslateIcon,
 } from "@mui/icons-material";
 import {
@@ -21,7 +20,6 @@ import {
   SelectChangeEvent,
   Switch,
   TextField,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";

@@ -1,13 +1,14 @@
 from typing import Annotated
 
-from app.core.config import settings
-from app.core.security import ALGORITHM
-from app.db.database import get_db
-from app.models.user import User
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
+
+from app.core.config import settings
+from app.core.security import ALGORITHM
+from app.db.database import get_db
+from app.models.user import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 

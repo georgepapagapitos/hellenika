@@ -1,13 +1,14 @@
 from datetime import datetime, timedelta
 from typing import List
 
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+
 from app.api.auth_deps import get_current_user
 from app.db.database import get_db
 from app.models.user import User
 from app.models.word import Word
 from app.schemas.admin import DashboardStats, RecentContent, RecentUser
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
 
 router = APIRouter(tags=["admin"])
 

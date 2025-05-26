@@ -1,9 +1,10 @@
 from datetime import datetime
 from typing import List, Optional
 
+from pydantic import BaseModel, ConfigDict
+
 from app.models.word import ApprovalStatus, Gender, WordType
 from app.schemas.user import UserOut
-from pydantic import BaseModel, ConfigDict
 
 
 class MeaningBase(BaseModel):

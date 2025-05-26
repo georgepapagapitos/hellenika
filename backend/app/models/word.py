@@ -1,9 +1,10 @@
 from datetime import datetime
 from enum import Enum
 
-from app.db.database import Base
 from sqlalchemy import Column, DateTime, ForeignKey, Identity, Integer, String
 from sqlalchemy.orm import relationship
+
+from app.db.database import Base
 
 
 class WordType(str, Enum):
