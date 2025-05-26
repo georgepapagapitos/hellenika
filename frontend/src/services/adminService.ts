@@ -1,16 +1,5 @@
-import axios from "axios";
 import { API_ENDPOINTS } from "../config";
-
-// Create a dedicated API client
-const createApiClient = () => {
-  return axios.create({
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-};
-
-const api = createApiClient();
+import { api } from "./apiClient";
 
 export interface DashboardStats {
   total_users: number;
@@ -37,39 +26,23 @@ export interface RecentContent {
 }
 
 class AdminService {
-  private getHeaders() {
-    const token = localStorage.getItem("token");
-    return {
-      Authorization: `Bearer ${token}`,
-    };
-  }
-
   async getDashboardStats(): Promise<DashboardStats> {
     const response = await api.get<DashboardStats>(
-      `${API_ENDPOINTS.admin}/stats`,
-      {
-        headers: this.getHeaders(),
-      }
+      `${API_ENDPOINTS.admin}/stats`
     );
     return response.data;
   }
 
   async getRecentUsers(): Promise<RecentUser[]> {
     const response = await api.get<RecentUser[]>(
-      `${API_ENDPOINTS.admin}/users`,
-      {
-        headers: this.getHeaders(),
-      }
+      `${API_ENDPOINTS.admin}/users`
     );
     return response.data;
   }
 
   async getRecentContent(): Promise<RecentContent[]> {
     const response = await api.get<RecentContent[]>(
-      `${API_ENDPOINTS.admin}/content`,
-      {
-        headers: this.getHeaders(),
-      }
+      `${API_ENDPOINTS.admin}/content`
     );
     return response.data;
   }

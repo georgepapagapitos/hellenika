@@ -1,9 +1,6 @@
 import { API_ENDPOINTS } from "../config";
 import { Gender, Word, WordFormData, WordType } from "../types";
-import { createApiClient } from "../services/apiClient";
-
-// Create a dedicated API client
-const api = createApiClient();
+import { api } from "./apiClient";
 
 interface WordFilters {
   page?: number;
@@ -33,56 +30,40 @@ export const wordService = {
     if (filters?.includePending) params.append("include_pending", "true");
 
     const response = await api.get<PaginatedResponse>(
-      `${API_ENDPOINTS.words}?${params.toString()}`,
-      {
-        headers: this.getHeaders(),
-      }
+      `${API_ENDPOINTS.words}?${params.toString()}`
     );
     return response.data;
   },
 
   async createWord(word: WordFormData): Promise<Word> {
-    const response = await api.post<Word>(API_ENDPOINTS.words, word, {
-      headers: this.getHeaders(),
-    });
+    const response = await api.post<Word>(API_ENDPOINTS.words, word);
     return response.data;
   },
 
   async updateWord(id: number, word: WordFormData): Promise<Word> {
-    const response = await api.put<Word>(`${API_ENDPOINTS.words}/${id}`, word, {
-      headers: this.getHeaders(),
-    });
+    const response = await api.put<Word>(`${API_ENDPOINTS.words}/${id}`, word);
     return response.data;
   },
 
   async deleteWord(id: number): Promise<void> {
-    await api.delete(`${API_ENDPOINTS.words}/${id}`, {
-      headers: this.getHeaders(),
-    });
+    await api.delete(`${API_ENDPOINTS.words}/${id}`);
   },
 
   async getWordById(id: number): Promise<Word> {
-    const response = await api.get<Word>(`${API_ENDPOINTS.words}/${id}`, {
-      headers: this.getHeaders(),
-    });
+    const response = await api.get<Word>(`${API_ENDPOINTS.words}/${id}`);
     return response.data;
   },
 
   // Admin only methods
   async getPendingWords(): Promise<Word[]> {
-    const response = await api.get<Word[]>(`${API_ENDPOINTS.words}/pending`, {
-      headers: this.getHeaders(),
-    });
+    const response = await api.get<Word[]>(`${API_ENDPOINTS.words}/pending`);
     return response.data;
   },
 
   async approveWord(id: number): Promise<Word> {
     const response = await api.post<Word>(
       `${API_ENDPOINTS.words}/${id}/approve`,
-      null,
-      {
-        headers: this.getHeaders(),
-      }
+      null
     );
     return response.data;
   },
@@ -90,18 +71,8 @@ export const wordService = {
   async rejectWord(id: number): Promise<Word> {
     const response = await api.post<Word>(
       `${API_ENDPOINTS.words}/${id}/reject`,
-      null,
-      {
-        headers: this.getHeaders(),
-      }
+      null
     );
     return response.data;
-  },
-
-  getHeaders() {
-    const token = localStorage.getItem("token");
-    return {
-      Authorization: token ? `Bearer ${token}` : "",
-    };
   },
 };
