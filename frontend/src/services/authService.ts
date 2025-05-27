@@ -37,7 +37,7 @@ class AuthService {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
-      }
+      },
     );
     this.setToken(response.data.access_token);
     return response.data;

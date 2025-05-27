@@ -24,9 +24,15 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(admin.router, prefix=f"{settings.API_V1_STR}/admin", tags=["admin"])
-app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"])
-app.include_router(words.router, prefix=f"{settings.API_V1_STR}/words", tags=["words"])
+app.include_router(
+    admin.router, prefix=f"{settings.API_V1_STR}/admin", tags=["admin"]
+)
+app.include_router(
+    auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"]
+)
+app.include_router(
+    words.router, prefix=f"{settings.API_V1_STR}/words", tags=["words"]
+)
 app.include_router(
     translation.router,
     prefix=f"{settings.API_V1_STR}/translation",

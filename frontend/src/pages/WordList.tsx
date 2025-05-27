@@ -117,7 +117,7 @@ const WordList = () => {
 
   const handleWordUpdated = (updatedWord: Word) => {
     setWords(
-      words.map((word) => (word.id === updatedWord.id ? updatedWord : word))
+      words.map((word) => (word.id === updatedWord.id ? updatedWord : word)),
     );
     setEditingWord(null);
   };
@@ -139,8 +139,8 @@ const WordList = () => {
         await wordService.deleteWord(deleteDialog.wordId);
         setWords(
           words.filter(
-            (word) => word.id !== undefined && word.id !== deleteDialog.wordId
-          )
+            (word) => word.id !== undefined && word.id !== deleteDialog.wordId,
+          ),
         );
         setDeleteDialog({ open: false, wordId: null });
       } catch (error) {
@@ -163,7 +163,7 @@ const WordList = () => {
 
   const handleMenuOpen = (
     event: React.MouseEvent<HTMLElement>,
-    wordId: number
+    wordId: number,
   ) => {
     setActionMenu({
       anchorEl: event.currentTarget,
@@ -310,8 +310,8 @@ const WordList = () => {
               <Table size="small" stickyHeader>
                 <TableHead>
                   <TableRow>
-                    <TableCell width="20%">Greek</TableCell>
-                    <TableCell width="30%">English</TableCell>
+                    <TableCell width="20%">Greek Word</TableCell>
+                    <TableCell width="30%">English Meaning</TableCell>
                     <TableCell width="15%">Type</TableCell>
                     <TableCell width="15%">Gender</TableCell>
                     <TableCell width="20%" align="center">
@@ -394,7 +394,7 @@ const WordList = () => {
                             color: getWordTypeColor(word.word_type).text,
                             border: "1px solid",
                             borderColor: getBorderColor(
-                              getWordTypeColor(word.word_type).text
+                              getWordTypeColor(word.word_type).text,
                             ),
                           }}
                         />
@@ -415,7 +415,7 @@ const WordList = () => {
                               color: getGenderColor(word.gender).text,
                               border: "1px solid",
                               borderColor: getBorderColor(
-                                getGenderColor(word.gender).text
+                                getGenderColor(word.gender).text,
                               ),
                             }}
                           />
@@ -623,12 +623,12 @@ const WordList = () => {
                       fontWeight: 400,
                     },
                     backgroundColor: getWordTypeColor(
-                      detailsDialog.word.word_type
+                      detailsDialog.word.word_type,
                     ).bg,
                     color: getWordTypeColor(detailsDialog.word.word_type).text,
                     border: "1px solid",
                     borderColor: getBorderColor(
-                      getWordTypeColor(detailsDialog.word.word_type).text
+                      getWordTypeColor(detailsDialog.word.word_type).text,
                     ),
                   }}
                 />
@@ -645,12 +645,12 @@ const WordList = () => {
                           fontWeight: 400,
                         },
                         backgroundColor: getGenderColor(
-                          detailsDialog.word.gender
+                          detailsDialog.word.gender,
                         ).bg,
                         color: getGenderColor(detailsDialog.word.gender).text,
                         border: "1px solid",
                         borderColor: getBorderColor(
-                          getGenderColor(detailsDialog.word.gender).text
+                          getGenderColor(detailsDialog.word.gender).text,
                         ),
                       }}
                     />
@@ -706,21 +706,25 @@ const WordList = () => {
                     >
                       <ListItemText
                         primary={
-                          <Typography
+                          <Box
                             sx={{
-                              fontWeight: meaning.is_primary ? 500 : 400,
-                              fontSize: "1rem",
-                              color: meaning.is_primary
-                                ? "primary.main"
-                                : "text.primary",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
                             }}
                           >
-                            {meaning.english_meaning}
-                          </Typography>
-                        }
-                        secondary={
-                          meaning.is_primary && (
-                            <Box sx={{ mt: 0.5 }}>
+                            <Typography
+                              sx={{
+                                fontWeight: meaning.is_primary ? 500 : 400,
+                                fontSize: "1rem",
+                                color: meaning.is_primary
+                                  ? "primary.main"
+                                  : "text.primary",
+                              }}
+                            >
+                              {meaning.english_meaning}
+                            </Typography>
+                            {meaning.is_primary && (
                               <Chip
                                 label="Primary"
                                 size="small"
@@ -732,8 +736,8 @@ const WordList = () => {
                                     alpha(theme.palette.primary.main, 0.5),
                                 }}
                               />
-                            </Box>
-                          )
+                            )}
+                          </Box>
                         }
                       />
                     </ListItem>

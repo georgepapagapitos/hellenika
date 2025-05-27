@@ -27,7 +27,7 @@ export const createApiClient = (): AxiosInstance => {
         window.location.href = "/auth";
       }
       return Promise.reject(error);
-    }
+    },
   );
 
   return client;

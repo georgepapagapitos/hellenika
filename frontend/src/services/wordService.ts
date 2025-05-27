@@ -30,7 +30,7 @@ export const wordService = {
     if (filters?.includePending) params.append("include_pending", "true");
 
     const response = await api.get<PaginatedResponse>(
-      `${API_ENDPOINTS.words}?${params.toString()}`
+      `${API_ENDPOINTS.words}?${params.toString()}`,
     );
     return response.data;
   },
@@ -63,7 +63,7 @@ export const wordService = {
   async approveWord(id: number): Promise<Word> {
     const response = await api.post<Word>(
       `${API_ENDPOINTS.words}/${id}/approve`,
-      null
+      null,
     );
     return response.data;
   },
@@ -71,7 +71,7 @@ export const wordService = {
   async rejectWord(id: number): Promise<Word> {
     const response = await api.post<Word>(
       `${API_ENDPOINTS.words}/${id}/reject`,
-      null
+      null,
     );
     return response.data;
   },

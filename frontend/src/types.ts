@@ -7,6 +7,7 @@ export enum WordType {
   PREPOSITION = "preposition",
   CONJUNCTION = "conjunction",
   ARTICLE = "article",
+  PREFIX = "prefix",
 }
 
 export enum Gender {

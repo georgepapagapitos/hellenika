@@ -1,6 +1,11 @@
 from datetime import datetime
 from typing import Dict, List, Optional
 
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from pydantic import BaseModel
+from sqlalchemy import or_
+from sqlalchemy.orm import Session, joinedload
+
 from app.api.auth_deps import get_current_admin_user, get_current_user
 from app.db.database import get_db
 from app.models.meaning import Meaning as DBMeaning
@@ -8,10 +13,6 @@ from app.models.user import User
 from app.models.word import ApprovalStatus
 from app.models.word import Word as DBWord
 from app.schemas.word import Word, WordCreate
-from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel
-from sqlalchemy import or_
-from sqlalchemy.orm import Session, joinedload
 
 
 class PaginatedResponse(BaseModel):
@@ -92,7 +93,9 @@ def read_words(
             or_(
                 DBWord.greek_word.ilike(search_term),
                 DBWord.notes.ilike(search_term),
-                DBWord.meanings.any(DBMeaning.english_meaning.ilike(search_term)),
+                DBWord.meanings.any(
+                    DBMeaning.english_meaning.ilike(search_term)
+                ),
             )
         )
 

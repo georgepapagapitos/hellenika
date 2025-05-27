@@ -16,6 +16,7 @@ class WordType(str, Enum):
     PREPOSITION = "preposition"
     CONJUNCTION = "conjunction"
     ARTICLE = "article"
+    PREFIX = "prefix"
 
 
 class Gender(str, Enum):

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -15,7 +15,8 @@ router = APIRouter(tags=["admin"])
 
 @router.get("/stats", response_model=DashboardStats)
 async def get_dashboard_stats(
-    db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not authorized")
@@ -24,30 +25,40 @@ async def get_dashboard_stats(
     total_users = db.query(User).count()
 
     # Get active users (users who have logged in within the last 30 days)
-    thirty_days_ago = datetime.utcnow() - timedelta(days=30)
-    active_users = db.query(User).filter(User.last_login >= thirty_days_ago).count()
+    now = datetime.now(UTC)
+    thirty_days_ago = now - timedelta(days=30)
+    active_users = (
+        db.query(User)
+        .filter(User.last_login >= thirty_days_ago.replace(tzinfo=None))
+        .count()
+    )
 
     # Get total content (words)
     total_content = db.query(Word).count()
 
     # Calculate user growth
-    now = datetime.utcnow()
     first_day_current_month = now.replace(
         day=1, hour=0, minute=0, second=0, microsecond=0
     )
-    first_day_prev_month = (first_day_current_month - timedelta(days=1)).replace(day=1)
+    first_day_prev_month = (
+        first_day_current_month - timedelta(days=1)
+    ).replace(day=1)
 
     # Count users created in current month
     current_month_users = (
-        db.query(User).filter(User.created_at >= first_day_current_month).count()
+        db.query(User)
+        .filter(
+            User.created_at >= first_day_current_month.replace(tzinfo=None)
+        )
+        .count()
     )
 
     # Count users created in previous month
     prev_month_users = (
         db.query(User)
         .filter(
-            User.created_at >= first_day_prev_month,
-            User.created_at < first_day_current_month,
+            User.created_at >= first_day_prev_month.replace(tzinfo=None),
+            User.created_at < first_day_current_month.replace(tzinfo=None),
         )
         .count()
     )
@@ -73,23 +84,30 @@ async def get_dashboard_stats(
 
 @router.get("/users", response_model=List[RecentUser])
 async def get_recent_users(
-    db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not authorized")
 
     # Get the 10 most recent users
-    recent_users = db.query(User).order_by(User.created_at.desc()).limit(10).all()
+    recent_users = (
+        db.query(User).order_by(User.created_at.desc()).limit(10).all()
+    )
 
+    now = datetime.now(UTC)
     return [
         RecentUser(
             id=user.id,
-            name=user.email.split("@")[0],  # Using email username as name for now
+            name=user.email.split("@")[
+                0
+            ],  # Using email username as name for now
             email=user.email,
             joined=user.created_at.strftime("%Y-%m-%d"),
             status=(
                 "active"
-                if user.last_login and (datetime.utcnow() - user.last_login).days < 30
+                if user.last_login
+                and (now - user.last_login.replace(tzinfo=UTC)).days < 30
                 else "inactive"
             ),
         )
@@ -99,13 +117,16 @@ async def get_recent_users(
 
 @router.get("/content", response_model=List[RecentContent])
 async def get_recent_content(
-    db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not authorized")
 
     # Get the 10 most recent words
-    recent_words = db.query(Word).order_by(Word.created_at.desc()).limit(10).all()
+    recent_words = (
+        db.query(Word).order_by(Word.created_at.desc()).limit(10).all()
+    )
 
     return [
         RecentContent(

@@ -24,4 +24,4 @@ npm run start &
 FRONTEND_PID=$!
 
 # Wait for both processes
-wait $BACKEND_PID $FRONTEND_PID 
+wait $BACKEND_PID $FRONTEND_PID

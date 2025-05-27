@@ -98,7 +98,7 @@ const WordForm: React.FC<WordFormProps> = ({
   const handleMeaningChange = (
     index: number,
     field: keyof MeaningFormData,
-    value: string | boolean
+    value: string | boolean,
   ) => {
     setFormData((prev) => {
       const newMeanings = [...prev.meanings];
@@ -137,7 +137,7 @@ const WordForm: React.FC<WordFormProps> = ({
       if (editWord && editWord.id !== undefined) {
         const updatedWord = await wordService.updateWord(
           editWord.id as number,
-          formData
+          formData,
         );
         onWordUpdated?.(updatedWord);
       } else {
@@ -405,7 +405,7 @@ const WordForm: React.FC<WordFormProps> = ({
                         boxShadow: (theme) =>
                           `0 4px 12px ${alpha(
                             theme.palette.primary.main,
-                            0.08
+                            0.08,
                           )}`,
                       },
                       position: "relative",
@@ -459,7 +459,7 @@ const WordForm: React.FC<WordFormProps> = ({
                               handleMeaningChange(
                                 index,
                                 "english_meaning",
-                                e.target.value
+                                e.target.value,
                               )
                             }
                             required
@@ -487,7 +487,7 @@ const WordForm: React.FC<WordFormProps> = ({
                               onClick={() =>
                                 handleTranslateToGreek(
                                   meaning.english_meaning,
-                                  index
+                                  index,
                                 )
                               }
                               disabled={
@@ -527,7 +527,7 @@ const WordForm: React.FC<WordFormProps> = ({
                                 handleMeaningChange(
                                   index,
                                   "is_primary",
-                                  e.target.checked
+                                  e.target.checked,
                                 )
                               }
                               color="primary"
