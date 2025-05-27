@@ -3,7 +3,7 @@ import { api } from "./apiClient";
 
 // Function to translate text from English to Greek
 export const translateToGreek = async (
-  text: string
+  text: string,
 ): Promise<string | null> => {
   try {
     const response = await api.post(`${API_ENDPOINTS.translation}/to-greek`, {
@@ -18,7 +18,7 @@ export const translateToGreek = async (
 
 // Function to translate text from Greek to English
 export const translateToEnglish = async (
-  text: string
+  text: string,
 ): Promise<string | null> => {
   try {
     const response = await api.post(`${API_ENDPOINTS.translation}/to-english`, {

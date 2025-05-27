@@ -11,15 +11,16 @@ export const getWordTypeColor = (type: WordType) => {
     [WordType.PREPOSITION]: { bg: "#FEF2F2", text: "#EF4444" }, // Light Red
     [WordType.CONJUNCTION]: { bg: "#F3F4F6", text: "#6B7280" }, // Light Gray
     [WordType.ARTICLE]: { bg: "#F9FAFB", text: "#9CA3AF" }, // Lighter Gray
+    [WordType.PREFIX]: { bg: "#FDF2F8", text: "#EC4899" }, // Light Pink
   };
   return colors[type];
 };
 
 export const getGenderColor = (gender: Gender) => {
   const colors: Record<Gender, { bg: string; text: string }> = {
-    [Gender.MASCULINE]: { bg: "#EFF6FF", text: "#2563EB" }, // Light Blue
-    [Gender.FEMININE]: { bg: "#FDF2F8", text: "#EC4899" }, // Light Pink
-    [Gender.NEUTER]: { bg: "#F0FDFA", text: "#14B8A6" }, // Light Teal
+    [Gender.MASCULINE]: { bg: "#F1F5F9", text: "#64748B" }, // Cool Gray
+    [Gender.FEMININE]: { bg: "#FDF4FF", text: "#C026D3" }, // Soft Purple
+    [Gender.NEUTER]: { bg: "#F0FDF4", text: "#16A34A" }, // Soft Green
   };
   return colors[gender];
 };

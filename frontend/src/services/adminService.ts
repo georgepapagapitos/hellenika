@@ -28,21 +28,21 @@ export interface RecentContent {
 class AdminService {
   async getDashboardStats(): Promise<DashboardStats> {
     const response = await api.get<DashboardStats>(
-      `${API_ENDPOINTS.admin}/stats`
+      `${API_ENDPOINTS.admin}/stats`,
     );
     return response.data;
   }
 
   async getRecentUsers(): Promise<RecentUser[]> {
     const response = await api.get<RecentUser[]>(
-      `${API_ENDPOINTS.admin}/users`
+      `${API_ENDPOINTS.admin}/users`,
     );
     return response.data;
   }
 
   async getRecentContent(): Promise<RecentContent[]> {
     const response = await api.get<RecentContent[]>(
-      `${API_ENDPOINTS.admin}/content`
+      `${API_ENDPOINTS.admin}/content`,
     );
     return response.data;
   }

@@ -2,10 +2,13 @@ import logging
 from typing import Optional
 
 import httpx
+
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
-GOOGLE_TRANSLATE_API_URL = "https://translation.googleapis.com/language/translate/v2"
+GOOGLE_TRANSLATE_API_URL = (
+    "https://translation.googleapis.com/language/translate/v2"
+)
 
 
 async def translate_text(text: str, target_language: str) -> Optional[str]:
@@ -14,7 +17,8 @@ async def translate_text(text: str, target_language: str) -> Optional[str]:
 
     Args:
         text: The text to translate
-        target_language: The target language code (e.g., 'en' for English, 'el' for Greek)
+        target_language: The target language code
+            (e.g., 'en' for English, 'el' for Greek)
 
     Returns:
         The translated text or None if translation fails
@@ -35,7 +39,9 @@ async def translate_text(text: str, target_language: str) -> Optional[str]:
             data = response.json()
 
             if data.get("data", {}).get("translations"):
-                translated_text = data["data"]["translations"][0]["translatedText"]
+                translated_text = data["data"]["translations"][0][
+                    "translatedText"
+                ]
                 logger.info(f"Translation successful: {translated_text}")
                 return translated_text
 

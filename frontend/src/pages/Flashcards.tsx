@@ -244,7 +244,7 @@ const Flashcards = () => {
                       color: getGenderColor(currentWord.gender).text,
                       border: "1px solid",
                       borderColor: getBorderColor(
-                        getGenderColor(currentWord.gender).text
+                        getGenderColor(currentWord.gender).text,
                       ),
                     }}
                   />

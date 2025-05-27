@@ -2,16 +2,21 @@ import logging
 from datetime import datetime, timedelta
 from typing import Annotated
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from sqlalchemy.orm import Session
+
 from app.api.auth_deps import get_current_user
-from app.core.security import create_access_token, get_password_hash, verify_password
+from app.core.security import (
+    create_access_token,
+    get_password_hash,
+    verify_password,
+)
 from app.db.database import get_db
 from app.models.user import User
 from app.schemas.user import Token
 from app.schemas.user import User as UserSchema
 from app.schemas.user import UserCreate
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -28,13 +33,18 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 
     db_user = get_user_by_email(db, email=user.email)
     if db_user:
-        logger.warning(f"Registration failed: Email {user.email} already exists")
+        logger.warning(
+            f"Registration failed: Email {user.email} already exists"
+        )
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered",
         )
 
     hashed_password = get_password_hash(user.password)
-    db_user = User(email=user.email, hashed_password=hashed_password, role=user.role)
+    db_user = User(
+        email=user.email, hashed_password=hashed_password, role=user.role
+    )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -48,7 +58,9 @@ def login(
     db: Session = Depends(get_db),
 ):
     user = get_user_by_email(db, email=form_data.username)
-    if not user or not verify_password(form_data.password, user.hashed_password):
+    if not user or not verify_password(
+        form_data.password, user.hashed_password
+    ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",

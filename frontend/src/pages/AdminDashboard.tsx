@@ -174,12 +174,12 @@ const AdminDashboard: React.FC = () => {
     (word) =>
       word.greek_word.toLowerCase().includes(pendingSearch.toLowerCase()) ||
       word.meanings.some((m) =>
-        m.english_meaning.toLowerCase().includes(pendingSearch.toLowerCase())
+        m.english_meaning.toLowerCase().includes(pendingSearch.toLowerCase()),
       ) ||
       (word.submitter?.email
         ?.toLowerCase()
         .includes(pendingSearch.toLowerCase()) ??
-        false)
+        false),
   );
 
   if (!stats) {
@@ -464,7 +464,7 @@ const AdminDashboard: React.FC = () => {
                                     }`}
                                   />
                                 </ListItem>
-                              )
+                              ),
                             )}
                           </List>
                         </Box>

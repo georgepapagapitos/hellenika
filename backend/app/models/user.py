@@ -1,7 +1,8 @@
 from datetime import datetime
 
-from app.db.database import Base
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
+
+from app.db.database import Base
 
 
 class User(Base):

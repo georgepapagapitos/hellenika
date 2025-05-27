@@ -24,10 +24,10 @@ export const createApiClient = (): AxiosInstance => {
       if (error.response?.status === 401) {
         // Clear token and redirect to login if unauthorized
         localStorage.removeItem("token");
-        window.location.href = "/login";
+        window.location.href = "/auth";
       }
       return Promise.reject(error);
-    }
+    },
   );
 
   return client;
