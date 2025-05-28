@@ -1,4 +1,4 @@
-from app.schemas.user import Token, TokenData, User, UserCreate, UserLogin
+from app.schemas.user import Token, TokenData, User, UserCreate
 from app.schemas.word import Meaning, MeaningCreate, Word, WordBase, WordCreate
 
 __all__ = [
@@ -6,7 +6,6 @@ __all__ = [
     "TokenData",
     "User",
     "UserCreate",
-    "UserLogin",
     "Meaning",
     "MeaningCreate",
     "Word",
