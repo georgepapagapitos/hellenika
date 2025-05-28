@@ -1,7 +1,13 @@
+from unittest.mock import patch
+
 from fastapi import status
 
 
-def test_translate_to_greek(client):
+@patch("app.core.translation.translate_text")
+def test_translate_to_greek(mock_translate, client):
+    # Mock the translation response
+    mock_translate.return_value = "Γεια σας, πώς είστε;"
+
     # Test translation to Greek
     response = client.post(
         "/api/v1/translation/to-greek", json={"text": "Hello, how are you?"}
@@ -13,7 +19,11 @@ def test_translate_to_greek(client):
     assert len(data["translated_text"]) > 0
 
 
-def test_translate_to_english(client):
+@patch("app.core.translation.translate_text")
+def test_translate_to_english(mock_translate, client):
+    # Mock the translation response
+    mock_translate.return_value = "Hello, how are you?"
+
     # Test translation to English
     response = client.post(
         "/api/v1/translation/to-english", json={"text": "Γεια σας, πώς είστε;"}
@@ -34,7 +44,11 @@ def test_translate_empty_text(client):
     assert "empty" in data["detail"].lower()
 
 
-def test_translate_special_characters(client):
+@patch("app.core.translation.translate_text")
+def test_translate_special_characters(mock_translate, client):
+    # Mock the translation response
+    mock_translate.return_value = "Γεια! Πώς είσαι; Είναι μια όμορφη μέρα."
+
     # Test translation with special characters
     response = client.post(
         "/api/v1/translation/to-greek",
