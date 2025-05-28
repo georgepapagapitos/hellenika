@@ -16,7 +16,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --watchAll=false --coverage",
     "eject": "react-scripts eject",
     "format": "npx prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss}\"",
     "tsc": "tsc",
