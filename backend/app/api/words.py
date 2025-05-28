@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -54,7 +54,7 @@ def create_word(
         notes=word.notes,
         approval_status=ApprovalStatus.PENDING,
         created_by=current_user.id,
-        created_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
     )
     db.add(db_word)
     db.flush()  # Get the word ID without committing
@@ -233,8 +233,10 @@ def update_word(
     db_word.gender = gender_value
     db_word.notes = word.notes
 
-    # If user is not admin, set status back to pending
-    if current_user.role != "admin":
+    # Set approval status based on user role
+    if current_user.role == "admin":
+        db_word.approval_status = ApprovalStatus.APPROVED
+    else:
         db_word.approval_status = ApprovalStatus.PENDING
 
     # Delete existing meanings

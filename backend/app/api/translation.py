@@ -21,6 +21,11 @@ class TranslationResponse(BaseModel):
 @router.post("/to-greek", response_model=TranslationResponse)
 async def translate_to_greek_endpoint(request: TranslationRequest):
     """Translate text to Greek."""
+    if not request.text.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Text cannot be empty",
+        )
     try:
         logger.info(f"Translating to Greek: {request.text}")
         translated_text = await translate_to_greek(request.text)
@@ -42,6 +47,11 @@ async def translate_to_greek_endpoint(request: TranslationRequest):
 @router.post("/to-english", response_model=TranslationResponse)
 async def translate_to_english_endpoint(request: TranslationRequest):
     """Translate text to English."""
+    if not request.text.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Text cannot be empty",
+        )
     try:
         logger.info(f"Translating to English: {request.text}")
         translated_text = await translate_to_english(request.text)

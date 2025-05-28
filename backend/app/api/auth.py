@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -38,7 +38,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
         )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered",
+            detail="Email already exists",
         )
 
     hashed_password = get_password_hash(user.password)
@@ -49,7 +49,18 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_user)
     logger.info(f"Successfully registered user with email: {user.email}")
-    return db_user
+
+    # Create access token
+    access_token_expires = timedelta(minutes=30)
+    access_token = create_access_token(
+        subject=user.email, expires_delta=access_token_expires
+    )
+
+    # Add token to response
+    response_data = db_user.__dict__.copy()
+    response_data["access_token"] = access_token
+    response_data["token_type"] = "bearer"
+    return response_data
 
 
 @router.post("/token", response_model=Token)
@@ -68,7 +79,7 @@ def login(
         )
 
     # Update last_login timestamp
-    user.last_login = datetime.utcnow()
+    user.last_login = datetime.now(UTC)
     db.commit()
 
     access_token_expires = timedelta(minutes=30)
