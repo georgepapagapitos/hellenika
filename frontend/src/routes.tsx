@@ -1,23 +1,23 @@
-import { Box, Container, Typography } from "@mui/material";
-import { ReactElement } from "react";
-import { Route, Routes } from "react-router-dom";
-import AdminRoute from "./components/AdminRoute";
-import Navbar from "./components/Navbar";
-import ProtectedRoute from "./components/ProtectedRoute";
-import AdminDashboard from "./pages/AdminDashboard";
-import AuthPage from "./pages/AuthPage";
-import EditWord from "./pages/EditWord";
-import Flashcards from "./pages/Flashcards";
-import WordForm from "./pages/WordForm";
-import WordList from "./pages/WordList";
+import { Box, Container, Typography } from '@mui/material';
+import { ReactElement } from 'react';
+import { Route, Routes } from 'react-router-dom';
+import AdminRoute from './components/AdminRoute';
+import Navbar from './components/Navbar';
+import ProtectedRoute from './components/ProtectedRoute';
+import AdminDashboard from './pages/AdminDashboard';
+import AuthPage from './pages/AuthPage';
+import EditWord from './pages/EditWord';
+import Flashcards from './pages/Flashcards';
+import WordForm from './pages/WordForm';
+import WordList from './pages/WordList';
 
 const AppRoutes = (): ReactElement => {
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "100vh",
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh'
       }}
     >
       <Navbar />
@@ -27,7 +27,7 @@ const AppRoutes = (): ReactElement => {
         sx={{
           flexGrow: 1,
           py: { xs: 2, sm: 3 },
-          backgroundColor: "background.default",
+          backgroundColor: 'background.default'
         }}
       >
         <Container maxWidth="lg">
@@ -82,10 +82,10 @@ const AppRoutes = (): ReactElement => {
         sx={{
           py: 3,
           px: 2,
-          mt: "auto",
-          backgroundColor: "background.paper",
-          borderTop: "1px solid",
-          borderColor: "divider",
+          mt: 'auto',
+          backgroundColor: 'background.paper',
+          borderTop: '1px solid',
+          borderColor: 'divider'
         }}
       >
         <Container maxWidth="lg">

@@ -8,8 +8,8 @@ import {
   Edit as EditIcon,
   People as PeopleIcon,
   Refresh as RefreshIcon,
-  Settings as SettingsIcon,
-} from "@mui/icons-material";
+  Settings as SettingsIcon
+} from '@mui/icons-material';
 import {
   Avatar,
   Box,
@@ -37,20 +37,15 @@ import {
   Snackbar,
   TextField,
   Typography,
-  useTheme,
-} from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAdmin } from "../contexts/AdminContext";
-import { useAuth } from "../contexts/AuthContext";
-import {
-  adminService,
-  DashboardStats,
-  RecentContent,
-  RecentUser,
-} from "../services/adminService";
-import { wordService } from "../services/wordService";
-import { Meaning, Word } from "../types";
+  useTheme
+} from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAdmin } from '../contexts/AdminContext';
+import { useAuth } from '../contexts/AuthContext';
+import { adminService, DashboardStats, RecentContent, RecentUser } from '../services/adminService';
+import { wordService } from '../services/wordService';
+import { Meaning, Word } from '../types';
 
 const AdminDashboard: React.FC = () => {
   const theme = useTheme();
@@ -62,37 +57,36 @@ const AdminDashboard: React.FC = () => {
   const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
   const [recentContent, setRecentContent] = useState<RecentContent[]>([]);
   const [pendingWords, setPendingWords] = useState<Word[]>([]);
-  const [pendingSearch, setPendingSearch] = useState("");
+  const [pendingSearch, setPendingSearch] = useState('');
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
-    severity: "success" | "error";
-  }>({ open: false, message: "", severity: "success" });
+    severity: 'success' | 'error';
+  }>({ open: false, message: '', severity: 'success' });
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
     wordId: number | null;
   }>({
     open: false,
-    wordId: null,
+    wordId: null
   });
 
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      const [statsData, usersData, contentData, pendingWordsData] =
-        await Promise.all([
-          adminService.getDashboardStats(),
-          adminService.getRecentUsers(),
-          adminService.getRecentContent(),
-          wordService.getPendingWords(),
-        ]);
+      const [statsData, usersData, contentData, pendingWordsData] = await Promise.all([
+        adminService.getDashboardStats(),
+        adminService.getRecentUsers(),
+        adminService.getRecentContent(),
+        wordService.getPendingWords()
+      ]);
 
       setStats(statsData);
       setRecentUsers(usersData);
       setRecentContent(contentData);
       setPendingWords(pendingWordsData);
     } catch (error) {
-      console.error("Error fetching dashboard data:", error);
+      console.error('Error fetching dashboard data:', error);
     } finally {
       setLoading(false);
     }
@@ -120,14 +114,14 @@ const AdminDashboard: React.FC = () => {
         await wordService.deleteWord(deleteDialog.wordId);
         await fetchDashboardData(); // Refresh the data
       } catch (error) {
-        console.error("Error deleting word:", error);
+        console.error('Error deleting word:', error);
       }
     }
     setDeleteDialog({ open: false, wordId: null });
   };
 
   const handleAddWord = () => {
-    navigate("/add");
+    navigate('/add');
   };
 
   const handleApproveWord = async (wordId: number) => {
@@ -137,15 +131,15 @@ const AdminDashboard: React.FC = () => {
       await refreshPendingCount(); // Refresh the global count
       setSnackbar({
         open: true,
-        message: "Word approved successfully",
-        severity: "success",
+        message: 'Word approved successfully',
+        severity: 'success'
       });
     } catch (error) {
-      console.error("Error approving word:", error);
+      console.error('Error approving word:', error);
       setSnackbar({
         open: true,
-        message: "Error approving word",
-        severity: "error",
+        message: 'Error approving word',
+        severity: 'error'
       });
     }
   };
@@ -157,15 +151,15 @@ const AdminDashboard: React.FC = () => {
       await refreshPendingCount(); // Refresh the global count
       setSnackbar({
         open: true,
-        message: "Word rejected successfully",
-        severity: "success",
+        message: 'Word rejected successfully',
+        severity: 'success'
       });
     } catch (error) {
-      console.error("Error rejecting word:", error);
+      console.error('Error rejecting word:', error);
       setSnackbar({
         open: true,
-        message: "Error rejecting word",
-        severity: "error",
+        message: 'Error rejecting word',
+        severity: 'error'
       });
     }
   };
@@ -174,12 +168,9 @@ const AdminDashboard: React.FC = () => {
     (word) =>
       word.greek_word.toLowerCase().includes(pendingSearch.toLowerCase()) ||
       word.meanings.some((m) =>
-        m.english_meaning.toLowerCase().includes(pendingSearch.toLowerCase()),
+        m.english_meaning.toLowerCase().includes(pendingSearch.toLowerCase())
       ) ||
-      (word.submitter?.email
-        ?.toLowerCase()
-        .includes(pendingSearch.toLowerCase()) ??
-        false),
+      (word.submitter?.email?.toLowerCase().includes(pendingSearch.toLowerCase()) ?? false)
   );
 
   if (!stats) {
@@ -187,10 +178,10 @@ const AdminDashboard: React.FC = () => {
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "50vh",
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '50vh'
           }}
         >
           <CircularProgress />
@@ -203,12 +194,12 @@ const AdminDashboard: React.FC = () => {
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Box
         sx={{
-          display: "flex",
-          flexDirection: { xs: "column", sm: "row" },
-          justifyContent: "space-between",
-          alignItems: { xs: "flex-start", sm: "center" },
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          justifyContent: 'space-between',
+          alignItems: { xs: 'flex-start', sm: 'center' },
           gap: 2,
-          mb: 3,
+          mb: 3
         }}
       >
         <Typography variant="h4" component="h1" gutterBottom={false}>
@@ -224,10 +215,10 @@ const AdminDashboard: React.FC = () => {
           variant="outlined"
           sx={{
             borderRadius: 2,
-            textTransform: "none",
-            "&:hover": {
-              backgroundColor: "rgba(37, 99, 235, 0.08)",
-            },
+            textTransform: 'none',
+            '&:hover': {
+              backgroundColor: 'rgba(37, 99, 235, 0.08)'
+            }
           }}
         >
           Refresh
@@ -239,13 +230,13 @@ const AdminDashboard: React.FC = () => {
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <Card
             sx={{
-              height: "100%",
+              height: '100%',
               borderRadius: 2,
-              transition: "all 0.2s",
-              "&:hover": {
-                transform: "translateY(-4px)",
-                boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
-              },
+              transition: 'all 0.2s',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)'
+              }
             }}
           >
             <CardHeader
@@ -270,10 +261,10 @@ const AdminDashboard: React.FC = () => {
                   mt: 2,
                   height: 8,
                   borderRadius: 4,
-                  backgroundColor: "rgba(37, 99, 235, 0.12)",
-                  "& .MuiLinearProgress-bar": {
-                    borderRadius: 4,
-                  },
+                  backgroundColor: 'rgba(37, 99, 235, 0.12)',
+                  '& .MuiLinearProgress-bar': {
+                    borderRadius: 4
+                  }
                 }}
               />
             </CardContent>
@@ -283,13 +274,13 @@ const AdminDashboard: React.FC = () => {
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <Card
             sx={{
-              height: "100%",
+              height: '100%',
               borderRadius: 2,
-              transition: "all 0.2s",
-              "&:hover": {
-                transform: "translateY(-4px)",
-                boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
-              },
+              transition: 'all 0.2s',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)'
+              }
             }}
           >
             <CardHeader
@@ -305,8 +296,7 @@ const AdminDashboard: React.FC = () => {
                 {stats.active_users}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {Math.round((stats.active_users / stats.total_users) * 100)}% of
-                total users
+                {Math.round((stats.active_users / stats.total_users) * 100)}% of total users
               </Typography>
               <LinearProgress
                 variant="determinate"
@@ -315,10 +305,10 @@ const AdminDashboard: React.FC = () => {
                   mt: 2,
                   height: 8,
                   borderRadius: 4,
-                  backgroundColor: "rgba(22, 163, 74, 0.12)",
-                  "& .MuiLinearProgress-bar": {
-                    borderRadius: 4,
-                  },
+                  backgroundColor: 'rgba(22, 163, 74, 0.12)',
+                  '& .MuiLinearProgress-bar': {
+                    borderRadius: 4
+                  }
                 }}
               />
             </CardContent>
@@ -328,13 +318,13 @@ const AdminDashboard: React.FC = () => {
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <Card
             sx={{
-              height: "100%",
+              height: '100%',
               borderRadius: 2,
-              transition: "all 0.2s",
-              "&:hover": {
-                transform: "translateY(-4px)",
-                boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
-              },
+              transition: 'all 0.2s',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)'
+              }
             }}
           >
             <CardHeader
@@ -359,10 +349,10 @@ const AdminDashboard: React.FC = () => {
                   mt: 2,
                   height: 8,
                   borderRadius: 4,
-                  backgroundColor: "rgba(14, 165, 233, 0.12)",
-                  "& .MuiLinearProgress-bar": {
-                    borderRadius: 4,
-                  },
+                  backgroundColor: 'rgba(14, 165, 233, 0.12)',
+                  '& .MuiLinearProgress-bar': {
+                    borderRadius: 4
+                  }
                 }}
               />
             </CardContent>
@@ -373,12 +363,12 @@ const AdminDashboard: React.FC = () => {
         <Grid size={{ xs: 12 }}>
           <Card
             sx={{
-              height: "100%",
+              height: '100%',
               borderRadius: 2,
-              transition: "all 0.2s",
-              "&:hover": {
-                boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
-              },
+              transition: 'all 0.2s',
+              '&:hover': {
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)'
+              }
             }}
           >
             <CardHeader
@@ -391,10 +381,10 @@ const AdminDashboard: React.FC = () => {
                   onClick={handleAddWord}
                   sx={{
                     borderRadius: 2,
-                    textTransform: "none",
-                    "&:hover": {
-                      backgroundColor: "rgba(37, 99, 235, 0.08)",
-                    },
+                    textTransform: 'none',
+                    '&:hover': {
+                      backgroundColor: 'rgba(37, 99, 235, 0.08)'
+                    }
                   }}
                 >
                   Add Word
@@ -416,56 +406,46 @@ const AdminDashboard: React.FC = () => {
                 <React.Fragment key={word.id}>
                   <ListItem
                     sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      py: 2,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                      py: 2
                     }}
                   >
                     <Box
                       sx={{
-                        width: "100%",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "flex-start",
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start'
                       }}
                     >
                       <Box>
                         <Typography variant="h6" sx={{ fontWeight: 600 }}>
                           {word.greek_word}
                         </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ mt: 0.5 }}
-                        >
-                          Submitted by: {word.submitter?.email || "Unknown"} on{" "}
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                          Submitted by: {word.submitter?.email || 'Unknown'} on{' '}
                           {word.created_at
                             ? new Date(word.created_at).toLocaleDateString()
-                            : "Unknown date"}
+                            : 'Unknown date'}
                         </Typography>
                         <Box sx={{ mt: 1 }}>
                           <Typography variant="body2">
                             <strong>Type:</strong> {word.word_type}
                           </Typography>
                           <Typography variant="body2">
-                            <strong>Gender:</strong> {word.gender || "N/A"}
+                            <strong>Gender:</strong> {word.gender || 'N/A'}
                           </Typography>
                           <Typography variant="body2">
                             <strong>Meanings:</strong>
                           </Typography>
                           <List dense>
-                            {word.meanings.map(
-                              (meaning: Meaning, idx: number) => (
-                                <ListItem key={idx} sx={{ py: 0 }}>
-                                  <ListItemText
-                                    primary={`${idx + 1}. ${
-                                      meaning.english_meaning
-                                    }`}
-                                  />
-                                </ListItem>
-                              ),
-                            )}
+                            {word.meanings.map((meaning: Meaning, idx: number) => (
+                              <ListItem key={idx} sx={{ py: 0 }}>
+                                <ListItemText primary={`${idx + 1}. ${meaning.english_meaning}`} />
+                              </ListItem>
+                            ))}
                           </List>
                         </Box>
                       </Box>
@@ -477,10 +457,7 @@ const AdminDashboard: React.FC = () => {
                         >
                           <CheckIcon />
                         </IconButton>
-                        <IconButton
-                          color="error"
-                          onClick={() => handleRejectWord(word.id)}
-                        >
+                        <IconButton color="error" onClick={() => handleRejectWord(word.id)}>
                           <CloseIcon />
                         </IconButton>
                       </Box>
@@ -494,7 +471,7 @@ const AdminDashboard: React.FC = () => {
                   <Typography
                     variant="body1"
                     color="text.secondary"
-                    sx={{ textAlign: "center", width: "100%" }}
+                    sx={{ textAlign: 'center', width: '100%' }}
                   >
                     No pending words
                   </Typography>
@@ -508,12 +485,12 @@ const AdminDashboard: React.FC = () => {
         <Grid size={{ xs: 12, md: 6 }}>
           <Card
             sx={{
-              height: "100%",
+              height: '100%',
               borderRadius: 2,
-              transition: "all 0.2s",
-              "&:hover": {
-                boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
-              },
+              transition: 'all 0.2s',
+              '&:hover': {
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)'
+              }
             }}
           >
             <CardHeader
@@ -523,13 +500,13 @@ const AdminDashboard: React.FC = () => {
                   variant="outlined"
                   size="small"
                   startIcon={<AddIcon />}
-                  onClick={() => navigate("/admin/users")}
+                  onClick={() => navigate('/admin/users')}
                   sx={{
                     borderRadius: 2,
-                    textTransform: "none",
-                    "&:hover": {
-                      backgroundColor: "rgba(37, 99, 235, 0.08)",
-                    },
+                    textTransform: 'none',
+                    '&:hover': {
+                      backgroundColor: 'rgba(37, 99, 235, 0.08)'
+                    }
                   }}
                 >
                   Add User
@@ -543,56 +520,46 @@ const AdminDashboard: React.FC = () => {
                     <Box sx={{ flex: 1 }}>
                       <Box
                         sx={{
-                          display: "flex",
-                          flexDirection: { xs: "column", sm: "row" },
-                          alignItems: { xs: "flex-start", sm: "center" },
+                          display: 'flex',
+                          flexDirection: { xs: 'column', sm: 'row' },
+                          alignItems: { xs: 'flex-start', sm: 'center' },
                           mb: 0.5,
-                          gap: { xs: 0.5, sm: 1 },
+                          gap: { xs: 0.5, sm: 1 }
                         }}
                       >
                         <Typography variant="subtitle1" component="span">
                           {user.name}
                         </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          component="span"
-                        >
+                        <Typography variant="body2" color="text.secondary" component="span">
                           {user.email}
                         </Typography>
                       </Box>
                       <Box
                         sx={{
-                          display: "flex",
-                          flexDirection: { xs: "column", sm: "row" },
-                          alignItems: { xs: "flex-start", sm: "center" },
-                          gap: { xs: 0.5, sm: 1 },
+                          display: 'flex',
+                          flexDirection: { xs: 'column', sm: 'row' },
+                          alignItems: { xs: 'flex-start', sm: 'center' },
+                          gap: { xs: 0.5, sm: 1 }
                         }}
                       >
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          component="span"
-                        >
+                        <Typography variant="body2" color="text.secondary" component="span">
                           Joined {user.joined}
                         </Typography>
                         <Chip
                           size="small"
                           label={user.status}
-                          color={
-                            user.status === "active" ? "success" : "default"
-                          }
+                          color={user.status === 'active' ? 'success' : 'default'}
                         />
                       </Box>
                     </Box>
                     <ListItemSecondaryAction>
-                      <Box sx={{ display: "flex", gap: 1 }}>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
                         <IconButton
                           size="small"
                           sx={{
-                            "&:hover": {
-                              backgroundColor: "rgba(37, 99, 235, 0.08)",
-                            },
+                            '&:hover': {
+                              backgroundColor: 'rgba(37, 99, 235, 0.08)'
+                            }
                           }}
                         >
                           <EditIcon />
@@ -601,9 +568,9 @@ const AdminDashboard: React.FC = () => {
                           size="small"
                           color="error"
                           sx={{
-                            "&:hover": {
-                              backgroundColor: "rgba(239, 68, 68, 0.08)",
-                            },
+                            '&:hover': {
+                              backgroundColor: 'rgba(239, 68, 68, 0.08)'
+                            }
                           }}
                         >
                           <DeleteIcon />
@@ -622,12 +589,12 @@ const AdminDashboard: React.FC = () => {
         <Grid size={{ xs: 12, md: 6 }}>
           <Card
             sx={{
-              height: "100%",
+              height: '100%',
               borderRadius: 2,
-              transition: "all 0.2s",
-              "&:hover": {
-                boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
-              },
+              transition: 'all 0.2s',
+              '&:hover': {
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)'
+              }
             }}
           >
             <CardHeader
@@ -640,10 +607,10 @@ const AdminDashboard: React.FC = () => {
                   onClick={handleAddWord}
                   sx={{
                     borderRadius: 2,
-                    textTransform: "none",
-                    "&:hover": {
-                      backgroundColor: "rgba(37, 99, 235, 0.08)",
-                    },
+                    textTransform: 'none',
+                    '&:hover': {
+                      backgroundColor: 'rgba(37, 99, 235, 0.08)'
+                    }
                   }}
                 >
                   Add Word
@@ -657,59 +624,47 @@ const AdminDashboard: React.FC = () => {
                     <Box sx={{ flex: 1 }}>
                       <Box
                         sx={{
-                          display: "flex",
-                          flexDirection: { xs: "column", sm: "row" },
-                          alignItems: { xs: "flex-start", sm: "center" },
+                          display: 'flex',
+                          flexDirection: { xs: 'column', sm: 'row' },
+                          alignItems: { xs: 'flex-start', sm: 'center' },
                           mb: 0.5,
-                          gap: { xs: 0.5, sm: 1 },
+                          gap: { xs: 0.5, sm: 1 }
                         }}
                       >
                         <Typography variant="subtitle1" component="span">
                           {content.title}
                         </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          component="span"
-                        >
+                        <Typography variant="body2" color="text.secondary" component="span">
                           {content.type}
                         </Typography>
                       </Box>
                       <Box
                         sx={{
-                          display: "flex",
-                          flexDirection: { xs: "column", sm: "row" },
-                          alignItems: { xs: "flex-start", sm: "center" },
-                          gap: { xs: 0.5, sm: 1 },
+                          display: 'flex',
+                          flexDirection: { xs: 'column', sm: 'row' },
+                          alignItems: { xs: 'flex-start', sm: 'center' },
+                          gap: { xs: 0.5, sm: 1 }
                         }}
                       >
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          component="span"
-                        >
+                        <Typography variant="body2" color="text.secondary" component="span">
                           Created {content.created}
                         </Typography>
                         <Chip
                           size="small"
                           label={content.status}
-                          color={
-                            content.status === "published"
-                              ? "success"
-                              : "default"
-                          }
+                          color={content.status === 'published' ? 'success' : 'default'}
                         />
                       </Box>
                     </Box>
                     <ListItemSecondaryAction>
-                      <Box sx={{ display: "flex", gap: 1 }}>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
                         <IconButton
                           size="small"
                           onClick={() => handleEditWord(content)}
                           sx={{
-                            "&:hover": {
-                              backgroundColor: "rgba(37, 99, 235, 0.08)",
-                            },
+                            '&:hover': {
+                              backgroundColor: 'rgba(37, 99, 235, 0.08)'
+                            }
                           }}
                         >
                           <EditIcon />
@@ -719,9 +674,9 @@ const AdminDashboard: React.FC = () => {
                           color="error"
                           onClick={() => handleDeleteWord(content.id)}
                           sx={{
-                            "&:hover": {
-                              backgroundColor: "rgba(239, 68, 68, 0.08)",
-                            },
+                            '&:hover': {
+                              backgroundColor: 'rgba(239, 68, 68, 0.08)'
+                            }
                           }}
                         >
                           <DeleteIcon />
@@ -741,10 +696,10 @@ const AdminDashboard: React.FC = () => {
           <Card
             sx={{
               borderRadius: 2,
-              transition: "all 0.2s",
-              "&:hover": {
-                boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
-              },
+              transition: 'all 0.2s',
+              '&:hover': {
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)'
+              }
             }}
           >
             <CardHeader title="Quick Actions" />
@@ -753,38 +708,38 @@ const AdminDashboard: React.FC = () => {
                 {[
                   {
                     icon: <PeopleIcon />,
-                    title: "Manage Users",
-                    color: theme.palette.primary.main,
+                    title: 'Manage Users',
+                    color: theme.palette.primary.main
                   },
                   {
                     icon: <ContentIcon />,
-                    title: "Content Management",
-                    color: theme.palette.info.main,
+                    title: 'Content Management',
+                    color: theme.palette.info.main
                   },
                   {
                     icon: <SettingsIcon />,
-                    title: "System Settings",
-                    color: theme.palette.warning.main,
+                    title: 'System Settings',
+                    color: theme.palette.warning.main
                   },
                   {
                     icon: <AnalyticsIcon />,
-                    title: "Analytics",
-                    color: theme.palette.success.main,
-                  },
+                    title: 'Analytics',
+                    color: theme.palette.success.main
+                  }
                 ].map((action, index) => (
                   <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
                     <Paper
                       sx={{
                         p: 2,
-                        textAlign: "center",
-                        cursor: "pointer",
+                        textAlign: 'center',
+                        cursor: 'pointer',
                         borderRadius: 2,
-                        transition: "all 0.2s",
-                        "&:hover": {
-                          backgroundColor: "rgba(37, 99, 235, 0.08)",
-                          transform: "translateY(-4px)",
-                          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
-                        },
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                          transform: 'translateY(-4px)',
+                          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)'
+                        }
                       }}
                     >
                       <Box
@@ -792,15 +747,13 @@ const AdminDashboard: React.FC = () => {
                           fontSize: 40,
                           color: action.color,
                           mb: 1,
-                          display: "flex",
-                          justifyContent: "center",
+                          display: 'flex',
+                          justifyContent: 'center'
                         }}
                       >
                         {action.icon}
                       </Box>
-                      <Typography variant="subtitle1">
-                        {action.title}
-                      </Typography>
+                      <Typography variant="subtitle1">{action.title}</Typography>
                     </Paper>
                   </Grid>
                 ))}
@@ -818,16 +771,11 @@ const AdminDashboard: React.FC = () => {
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete this word? This action cannot be
-            undone.
+            Are you sure you want to delete this word? This action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={() => setDeleteDialog({ open: false, wordId: null })}
-          >
-            Cancel
-          </Button>
+          <Button onClick={() => setDeleteDialog({ open: false, wordId: null })}>Cancel</Button>
           <Button onClick={confirmDelete} color="error" variant="contained">
             Delete
           </Button>
@@ -839,7 +787,7 @@ const AdminDashboard: React.FC = () => {
         autoHideDuration={3000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         message={snackbar.message}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       />
     </Container>
   );

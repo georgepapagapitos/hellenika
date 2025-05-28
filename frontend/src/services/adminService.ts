@@ -1,5 +1,5 @@
-import { API_ENDPOINTS } from "../config";
-import { api } from "./apiClient";
+import { API_ENDPOINTS } from '../config';
+import { api } from './apiClient';
 
 export interface DashboardStats {
   total_users: number;
@@ -27,23 +27,17 @@ export interface RecentContent {
 
 class AdminService {
   async getDashboardStats(): Promise<DashboardStats> {
-    const response = await api.get<DashboardStats>(
-      `${API_ENDPOINTS.admin}/stats`,
-    );
+    const response = await api.get<DashboardStats>(`${API_ENDPOINTS.admin}/stats`);
     return response.data;
   }
 
   async getRecentUsers(): Promise<RecentUser[]> {
-    const response = await api.get<RecentUser[]>(
-      `${API_ENDPOINTS.admin}/users`,
-    );
+    const response = await api.get<RecentUser[]>(`${API_ENDPOINTS.admin}/users`);
     return response.data;
   }
 
   async getRecentContent(): Promise<RecentContent[]> {
-    const response = await api.get<RecentContent[]>(
-      `${API_ENDPOINTS.admin}/content`,
-    );
+    const response = await api.get<RecentContent[]>(`${API_ENDPOINTS.admin}/content`);
     return response.data;
   }
 }

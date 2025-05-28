@@ -1,9 +1,9 @@
-import CloseIcon from "@mui/icons-material/Close";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import SearchIcon from "@mui/icons-material/Search";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import SearchIcon from '@mui/icons-material/Search';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
   alpha,
   Box,
@@ -36,19 +36,15 @@ import {
   TableRow,
   TextField,
   Tooltip,
-  Typography,
-} from "@mui/material";
-import React, { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
-import { wordService } from "../services/wordService";
-import { Gender, Word, WordType } from "../types";
-import {
-  getWordTypeColor,
-  getGenderColor,
-  getBorderColor,
-} from "../utils/chipColors";
-import WordForm from "./WordForm";
+  Typography
+} from '@mui/material';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { wordService } from '../services/wordService';
+import { Gender, Word, WordType } from '../types';
+import { getWordTypeColor, getGenderColor, getBorderColor } from '../utils/chipColors';
+import WordForm from './WordForm';
 
 const WordList = () => {
   const { user } = useAuth();
@@ -61,18 +57,18 @@ const WordList = () => {
     wordId: number | null;
   }>({
     open: false,
-    wordId: null,
+    wordId: null
   });
   const [detailsDialog, setDetailsDialog] = useState<{
     open: boolean;
     word: Word | null;
   }>({
     open: false,
-    word: null,
+    word: null
   });
-  const [searchTerm, setSearchTerm] = useState("");
-  const [wordTypeFilter, setWordTypeFilter] = useState<WordType | "">("");
-  const [genderFilter, setGenderFilter] = useState<Gender | "">("");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [wordTypeFilter, setWordTypeFilter] = useState<WordType | ''>('');
+  const [genderFilter, setGenderFilter] = useState<Gender | ''>('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
@@ -82,7 +78,7 @@ const WordList = () => {
     wordId: number | null;
   }>({
     anchorEl: null,
-    wordId: null,
+    wordId: null
   });
   const navigate = useNavigate();
 
@@ -94,13 +90,13 @@ const WordList = () => {
         wordType: wordTypeFilter || undefined,
         gender: genderFilter || undefined,
         page,
-        size: pageSize,
+        size: pageSize
       });
       setWords(response.items);
       setTotalPages(response.pages);
       setTotalItems(response.total);
     } catch (err) {
-      setError("Failed to fetch words");
+      setError('Failed to fetch words');
       console.error(err);
     } finally {
       setLoading(false);
@@ -116,9 +112,7 @@ const WordList = () => {
   }, [fetchWords]);
 
   const handleWordUpdated = (updatedWord: Word) => {
-    setWords(
-      words.map((word) => (word.id === updatedWord.id ? updatedWord : word)),
-    );
+    setWords(words.map((word) => (word.id === updatedWord.id ? updatedWord : word)));
     setEditingWord(null);
   };
 
@@ -129,7 +123,7 @@ const WordList = () => {
   const handleDeleteClick = (wordId: number) => {
     setDeleteDialog({
       open: true,
-      wordId,
+      wordId
     });
   };
 
@@ -137,14 +131,10 @@ const WordList = () => {
     if (deleteDialog.wordId !== null) {
       try {
         await wordService.deleteWord(deleteDialog.wordId);
-        setWords(
-          words.filter(
-            (word) => word.id !== undefined && word.id !== deleteDialog.wordId,
-          ),
-        );
+        setWords(words.filter((word) => word.id !== undefined && word.id !== deleteDialog.wordId));
         setDeleteDialog({ open: false, wordId: null });
       } catch (error) {
-        console.error("Error deleting word:", error);
+        console.error('Error deleting word:', error);
       }
     }
   };
@@ -161,20 +151,17 @@ const WordList = () => {
     setDetailsDialog({ open: false, word: null });
   };
 
-  const handleMenuOpen = (
-    event: React.MouseEvent<HTMLElement>,
-    wordId: number,
-  ) => {
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, wordId: number) => {
     setActionMenu({
       anchorEl: event.currentTarget,
-      wordId,
+      wordId
     });
   };
 
   const handleMenuClose = () => {
     setActionMenu({
       anchorEl: null,
-      wordId: null,
+      wordId: null
     });
   };
 
@@ -186,7 +173,7 @@ const WordList = () => {
 
   if (error) {
     return (
-      <Box sx={{ p: 4, textAlign: "center" }}>
+      <Box sx={{ p: 4, textAlign: 'center' }}>
         <Typography color="error" sx={{ mb: 2 }}>
           {error}
         </Typography>
@@ -198,14 +185,14 @@ const WordList = () => {
   }
 
   return (
-    <Box sx={{ p: { xs: 1, sm: 2 }, maxWidth: "1200px", margin: "0 auto" }}>
+    <Box sx={{ p: { xs: 1, sm: 2 }, maxWidth: '1200px', margin: '0 auto' }}>
       <Box
         sx={{
-          display: "flex",
-          flexDirection: { xs: "column", sm: "row" },
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
           gap: 2,
           mb: 3,
-          alignItems: { xs: "stretch", sm: "center" },
+          alignItems: { xs: 'stretch', sm: 'center' }
         }}
       >
         <TextField
@@ -219,21 +206,21 @@ const WordList = () => {
               <InputAdornment position="start">
                 <SearchIcon color="action" />
               </InputAdornment>
-            ),
+            )
           }}
           sx={{
-            "& .MuiOutlinedInput-root": {
+            '& .MuiOutlinedInput-root': {
               borderRadius: 2,
-              backgroundColor: "background.paper",
-            },
+              backgroundColor: 'background.paper'
+            }
           }}
         />
-        <FormControl sx={{ minWidth: { xs: "100%", sm: 120 } }}>
+        <FormControl sx={{ minWidth: { xs: '100%', sm: 120 } }}>
           <InputLabel>Type</InputLabel>
           <Select
             value={wordTypeFilter}
             label="Type"
-            onChange={(e) => setWordTypeFilter(e.target.value as WordType | "")}
+            onChange={(e) => setWordTypeFilter(e.target.value as WordType | '')}
             sx={{ borderRadius: 2 }}
           >
             <MenuItem value="">All</MenuItem>
@@ -244,12 +231,12 @@ const WordList = () => {
             ))}
           </Select>
         </FormControl>
-        <FormControl sx={{ minWidth: { xs: "100%", sm: 120 } }}>
+        <FormControl sx={{ minWidth: { xs: '100%', sm: 120 } }}>
           <InputLabel>Gender</InputLabel>
           <Select
             value={genderFilter}
             label="Gender"
-            onChange={(e) => setGenderFilter(e.target.value as Gender | "")}
+            onChange={(e) => setGenderFilter(e.target.value as Gender | '')}
             sx={{ borderRadius: 2 }}
           >
             <MenuItem value="">All</MenuItem>
@@ -274,19 +261,18 @@ const WordList = () => {
           <TableContainer
             component={Paper}
             sx={{
-              maxHeight: "calc(100vh - 250px)",
+              maxHeight: 'calc(100vh - 250px)',
               borderRadius: 2,
-              boxShadow: (theme) =>
-                `0 4px 20px ${alpha(theme.palette.primary.main, 0.1)}`,
+              boxShadow: (theme) => `0 4px 20px ${alpha(theme.palette.primary.main, 0.1)}`
             }}
           >
             {loading ? (
               <Box
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "200px",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '200px'
                 }}
               >
                 <CircularProgress />
@@ -295,8 +281,8 @@ const WordList = () => {
               <Box
                 sx={{
                   p: 4,
-                  textAlign: "center",
-                  color: "text.secondary",
+                  textAlign: 'center',
+                  color: 'text.secondary'
                 }}
               >
                 <Typography variant="h6" gutterBottom>
@@ -325,28 +311,26 @@ const WordList = () => {
                       key={word.id}
                       hover
                       sx={{
-                        "&:hover": {
-                          backgroundColor: (theme) =>
-                            alpha(theme.palette.primary.main, 0.04),
-                        },
+                        '&:hover': {
+                          backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.04)
+                        }
                       }}
                     >
                       <TableCell>{word.greek_word}</TableCell>
                       <TableCell>
                         <Box
                           sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 0.5,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.5
                           }}
                         >
-                          {word.meanings.find((m) => m.is_primary)
-                            ?.english_meaning ||
+                          {word.meanings.find((m) => m.is_primary)?.english_meaning ||
                             word.meanings[0]?.english_meaning}
                           {word.meanings.length > 1 && (
                             <Tooltip
                               title={`${word.meanings.length - 1} more meaning${
-                                word.meanings.length > 2 ? "s" : ""
+                                word.meanings.length > 2 ? 's' : ''
                               }`}
                               arrow
                               placement="top"
@@ -359,17 +343,17 @@ const WordList = () => {
                                 }}
                                 sx={{
                                   ml: 0.5,
-                                  display: "inline-flex",
-                                  alignItems: "center",
-                                  color: "primary.main",
-                                  cursor: "pointer",
-                                  fontSize: "0.75rem",
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  color: 'primary.main',
+                                  cursor: 'pointer',
+                                  fontSize: '0.75rem',
                                   fontWeight: 500,
                                   opacity: 0.8,
-                                  "&:hover": {
+                                  '&:hover': {
                                     opacity: 1,
-                                    textDecoration: "underline",
-                                  },
+                                    textDecoration: 'underline'
+                                  }
                                 }}
                               >
                                 +{word.meanings.length - 1}
@@ -384,18 +368,15 @@ const WordList = () => {
                           size="small"
                           sx={{
                             fontWeight: 400,
-                            fontSize: "0.75rem",
-                            "& .MuiChip-label": {
+                            fontSize: '0.75rem',
+                            '& .MuiChip-label': {
                               px: 1,
-                              fontWeight: 400,
+                              fontWeight: 400
                             },
-                            backgroundColor: getWordTypeColor(word.word_type)
-                              .bg,
+                            backgroundColor: getWordTypeColor(word.word_type).bg,
                             color: getWordTypeColor(word.word_type).text,
-                            border: "1px solid",
-                            borderColor: getBorderColor(
-                              getWordTypeColor(word.word_type).text,
-                            ),
+                            border: '1px solid',
+                            borderColor: getBorderColor(getWordTypeColor(word.word_type).text)
                           }}
                         />
                       </TableCell>
@@ -406,17 +387,15 @@ const WordList = () => {
                             size="small"
                             sx={{
                               fontWeight: 400,
-                              fontSize: "0.75rem",
-                              "& .MuiChip-label": {
+                              fontSize: '0.75rem',
+                              '& .MuiChip-label': {
                                 px: 1,
-                                fontWeight: 400,
+                                fontWeight: 400
                               },
                               backgroundColor: getGenderColor(word.gender).bg,
                               color: getGenderColor(word.gender).text,
-                              border: "1px solid",
-                              borderColor: getBorderColor(
-                                getGenderColor(word.gender).text,
-                              ),
+                              border: '1px solid',
+                              borderColor: getBorderColor(getGenderColor(word.gender).text)
                             }}
                           />
                         )}
@@ -424,21 +403,17 @@ const WordList = () => {
                       <TableCell align="center">
                         <Box
                           sx={{
-                            display: "flex",
-                            justifyContent: "center",
+                            display: 'flex',
+                            justifyContent: 'center'
                           }}
                         >
                           <IconButton
                             size="small"
-                            onClick={(e) =>
-                              word.id !== undefined &&
-                              handleMenuOpen(e, word.id)
-                            }
+                            onClick={(e) => word.id !== undefined && handleMenuOpen(e, word.id)}
                             sx={{
-                              "&:hover": {
-                                backgroundColor: (theme) =>
-                                  alpha(theme.palette.primary.main, 0.1),
-                              },
+                              '&:hover': {
+                                backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.1)
+                              }
                             }}
                           >
                             <MoreVertIcon fontSize="small" />
@@ -459,9 +434,8 @@ const WordList = () => {
             PaperProps={{
               sx: {
                 borderRadius: 1,
-                boxShadow: (theme) =>
-                  `0 4px 20px ${alpha(theme.palette.primary.main, 0.15)}`,
-              },
+                boxShadow: (theme) => `0 4px 20px ${alpha(theme.palette.primary.main, 0.15)}`
+              }
             }}
           >
             <MenuItem
@@ -490,7 +464,7 @@ const WordList = () => {
               <EditIcon fontSize="small" sx={{ mr: 1 }} />
               Edit
             </MenuItem>
-            {user?.role === "admin" && (
+            {user?.role === 'admin' && (
               <MenuItem
                 onClick={() => {
                   if (actionMenu.wordId !== null) {
@@ -498,7 +472,7 @@ const WordList = () => {
                   }
                   handleMenuClose();
                 }}
-                sx={{ py: 1, color: "error.main" }}
+                sx={{ py: 1, color: 'error.main' }}
               >
                 <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
                 Delete
@@ -510,14 +484,14 @@ const WordList = () => {
             <Box
               sx={{
                 mt: 2,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                flexDirection: { xs: "column", sm: "row" },
-                gap: { xs: 1, sm: 0 },
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexDirection: { xs: 'column', sm: 'row' },
+                gap: { xs: 1, sm: 0 }
               }}
             >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Typography variant="body2" color="text.secondary">
                   Showing {words.length} of {totalItems} words
                 </Typography>
@@ -544,9 +518,9 @@ const WordList = () => {
                 color="primary"
                 size="small"
                 sx={{
-                  "& .MuiPaginationItem-root": {
-                    borderRadius: 1,
-                  },
+                  '& .MuiPaginationItem-root': {
+                    borderRadius: 1
+                  }
                 }}
               />
             </Box>
@@ -554,17 +528,11 @@ const WordList = () => {
         </>
       )}
 
-      <Dialog
-        open={deleteDialog.open}
-        onClose={handleDeleteCancel}
-        maxWidth="xs"
-        fullWidth
-      >
+      <Dialog open={deleteDialog.open} onClose={handleDeleteCancel} maxWidth="xs" fullWidth>
         <DialogTitle>Delete Word</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete this word? This action cannot be
-            undone.
+            Are you sure you want to delete this word? This action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -583,9 +551,8 @@ const WordList = () => {
         PaperProps={{
           sx: {
             borderRadius: 2,
-            boxShadow: (theme) =>
-              `0 4px 20px ${alpha(theme.palette.primary.main, 0.15)}`,
-          },
+            boxShadow: (theme) => `0 4px 20px ${alpha(theme.palette.primary.main, 0.15)}`
+          }
         }}
       >
         {detailsDialog.word && (
@@ -594,20 +561,19 @@ const WordList = () => {
               sx={{
                 m: 0,
                 p: 2,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                backgroundColor: (theme) =>
-                  alpha(theme.palette.primary.main, 0.05),
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.05)
               }}
             >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                 <Typography
                   variant="h5"
                   sx={{
                     fontWeight: 600,
-                    color: "primary.main",
-                    letterSpacing: "-0.5px",
+                    color: 'primary.main',
+                    letterSpacing: '-0.5px'
                   }}
                 >
                   {detailsDialog.word.greek_word}
@@ -617,54 +583,44 @@ const WordList = () => {
                   size="small"
                   sx={{
                     fontWeight: 400,
-                    fontSize: "0.75rem",
-                    "& .MuiChip-label": {
+                    fontSize: '0.75rem',
+                    '& .MuiChip-label': {
                       px: 1,
-                      fontWeight: 400,
+                      fontWeight: 400
                     },
-                    backgroundColor: getWordTypeColor(
-                      detailsDialog.word.word_type,
-                    ).bg,
+                    backgroundColor: getWordTypeColor(detailsDialog.word.word_type).bg,
                     color: getWordTypeColor(detailsDialog.word.word_type).text,
-                    border: "1px solid",
-                    borderColor: getBorderColor(
-                      getWordTypeColor(detailsDialog.word.word_type).text,
-                    ),
+                    border: '1px solid',
+                    borderColor: getBorderColor(getWordTypeColor(detailsDialog.word.word_type).text)
                   }}
                 />
-                {detailsDialog.word.word_type === WordType.NOUN &&
-                  detailsDialog.word.gender && (
-                    <Chip
-                      label={detailsDialog.word.gender.toUpperCase()}
-                      size="small"
-                      sx={{
-                        fontWeight: 400,
-                        fontSize: "0.75rem",
-                        "& .MuiChip-label": {
-                          px: 1,
-                          fontWeight: 400,
-                        },
-                        backgroundColor: getGenderColor(
-                          detailsDialog.word.gender,
-                        ).bg,
-                        color: getGenderColor(detailsDialog.word.gender).text,
-                        border: "1px solid",
-                        borderColor: getBorderColor(
-                          getGenderColor(detailsDialog.word.gender).text,
-                        ),
-                      }}
-                    />
-                  )}
+                {detailsDialog.word.word_type === WordType.NOUN && detailsDialog.word.gender && (
+                  <Chip
+                    label={detailsDialog.word.gender.toUpperCase()}
+                    size="small"
+                    sx={{
+                      fontWeight: 400,
+                      fontSize: '0.75rem',
+                      '& .MuiChip-label': {
+                        px: 1,
+                        fontWeight: 400
+                      },
+                      backgroundColor: getGenderColor(detailsDialog.word.gender).bg,
+                      color: getGenderColor(detailsDialog.word.gender).text,
+                      border: '1px solid',
+                      borderColor: getBorderColor(getGenderColor(detailsDialog.word.gender).text)
+                    }}
+                  />
+                )}
               </Box>
               <IconButton
                 aria-label="close"
                 onClick={handleCloseDetails}
                 sx={{
                   color: (theme) => theme.palette.grey[500],
-                  "&:hover": {
-                    backgroundColor: (theme) =>
-                      alpha(theme.palette.grey[500], 0.1),
-                  },
+                  '&:hover': {
+                    backgroundColor: (theme) => alpha(theme.palette.grey[500], 0.1)
+                  }
                 }}
               >
                 <CloseIcon />
@@ -677,8 +633,8 @@ const WordList = () => {
                   sx={{
                     mb: 2,
                     fontWeight: 600,
-                    color: "primary.main",
-                    letterSpacing: "-0.5px",
+                    color: 'primary.main',
+                    letterSpacing: '-0.5px'
                   }}
                 >
                   Meanings
@@ -693,33 +649,31 @@ const WordList = () => {
                           : (theme) => alpha(theme.palette.grey[200], 0.5),
                         borderRadius: 1,
                         mb: 0.5,
-                        border: "1px solid",
+                        border: '1px solid',
                         borderColor: meaning.is_primary
                           ? (theme) => alpha(theme.palette.primary.main, 0.2)
                           : (theme) => alpha(theme.palette.grey[400], 0.2),
-                        "&:hover": {
+                        '&:hover': {
                           backgroundColor: meaning.is_primary
                             ? (theme) => alpha(theme.palette.primary.main, 0.12)
-                            : (theme) => alpha(theme.palette.grey[200], 0.7),
-                        },
+                            : (theme) => alpha(theme.palette.grey[200], 0.7)
+                        }
                       }}
                     >
                       <ListItemText
                         primary={
                           <Box
                             sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1
                             }}
                           >
                             <Typography
                               sx={{
                                 fontWeight: meaning.is_primary ? 500 : 400,
-                                fontSize: "1rem",
-                                color: meaning.is_primary
-                                  ? "primary.main"
-                                  : "text.primary",
+                                fontSize: '1rem',
+                                color: meaning.is_primary ? 'primary.main' : 'text.primary'
                               }}
                             >
                               {meaning.english_meaning}
@@ -731,9 +685,8 @@ const WordList = () => {
                                 color="primary"
                                 variant="outlined"
                                 sx={{
-                                  "& .MuiChip-label": { px: 1 },
-                                  borderColor: (theme) =>
-                                    alpha(theme.palette.primary.main, 0.5),
+                                  '& .MuiChip-label': { px: 1 },
+                                  borderColor: (theme) => alpha(theme.palette.primary.main, 0.5)
                                 }}
                               />
                             )}
@@ -751,8 +704,8 @@ const WordList = () => {
                       sx={{
                         mb: 2,
                         fontWeight: 600,
-                        color: "primary.main",
-                        letterSpacing: "-0.5px",
+                        color: 'primary.main',
+                        letterSpacing: '-0.5px'
                       }}
                     >
                       Notes
@@ -761,7 +714,7 @@ const WordList = () => {
                       variant="body1"
                       sx={{
                         lineHeight: 1.6,
-                        color: "text.secondary",
+                        color: 'text.secondary'
                       }}
                     >
                       {detailsDialog.word.notes}
@@ -775,8 +728,8 @@ const WordList = () => {
                 onClick={handleCloseDetails}
                 sx={{
                   fontWeight: 500,
-                  textTransform: "none",
-                  px: 2,
+                  textTransform: 'none',
+                  px: 2
                 }}
               >
                 Close

@@ -1,4 +1,4 @@
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/v1";
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/v1';
 
 export { API_URL };
 
@@ -8,7 +8,7 @@ export const API_ENDPOINTS = {
   auth: {
     token: `${API_URL}/auth/token`,
     register: `${API_URL}/auth/register`,
-    me: `${API_URL}/auth/users/me`,
+    me: `${API_URL}/auth/users/me`
   },
-  admin: `${API_URL}/admin`,
+  admin: `${API_URL}/admin`
 } as const;

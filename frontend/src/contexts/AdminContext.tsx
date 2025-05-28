@@ -1,12 +1,6 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-import { wordService } from "../services/wordService";
-import { useAuth } from "./AuthContext";
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { wordService } from '../services/wordService';
+import { useAuth } from './AuthContext';
 
 interface AdminContextType {
   pendingCount: number;
@@ -15,19 +9,17 @@ interface AdminContextType {
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
-export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [pendingCount, setPendingCount] = useState(0);
   const { user } = useAuth();
 
   const fetchPendingCount = useCallback(async () => {
-    if (user?.role === "admin") {
+    if (user?.role === 'admin') {
       try {
         const pendingWords = await wordService.getPendingWords();
         setPendingCount(pendingWords.length);
       } catch (error) {
-        console.error("Error fetching pending words count:", error);
+        console.error('Error fetching pending words count:', error);
       }
     }
   }, [user?.role]);
@@ -40,9 +32,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [fetchPendingCount]);
 
   return (
-    <AdminContext.Provider
-      value={{ pendingCount, refreshPendingCount: fetchPendingCount }}
-    >
+    <AdminContext.Provider value={{ pendingCount, refreshPendingCount: fetchPendingCount }}>
       {children}
     </AdminContext.Provider>
   );
@@ -51,7 +41,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({
 export const useAdmin = () => {
   const context = useContext(AdminContext);
   if (context === undefined) {
-    throw new Error("useAdmin must be used within an AdminProvider");
+    throw new Error('useAdmin must be used within an AdminProvider');
   }
   return context;
 };

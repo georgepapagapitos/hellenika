@@ -1,9 +1,9 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import WordForm from "../pages/WordForm";
-import { wordService } from "../services/wordService";
-import { Word } from "../types";
+import { Box, CircularProgress, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import WordForm from '../pages/WordForm';
+import { wordService } from '../services/wordService';
+import { Word } from '../types';
 
 const EditWord: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,14 +18,14 @@ const EditWord: React.FC = () => {
         setLoading(true);
         setError(null);
         if (!id) {
-          setError("No word ID provided");
+          setError('No word ID provided');
           return;
         }
         const wordData = await wordService.getWordById(parseInt(id));
         setWord(wordData);
       } catch (error) {
-        console.error("Error fetching word:", error);
-        setError("Failed to load word");
+        console.error('Error fetching word:', error);
+        setError('Failed to load word');
       } finally {
         setLoading(false);
       }
@@ -42,10 +42,10 @@ const EditWord: React.FC = () => {
     return (
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "50vh",
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '50vh'
         }}
       >
         <CircularProgress />
@@ -57,12 +57,12 @@ const EditWord: React.FC = () => {
     return (
       <Box
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "50vh",
-          gap: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '50vh',
+          gap: 2
         }}
       >
         <Typography color="error" variant="h6">
@@ -71,7 +71,7 @@ const EditWord: React.FC = () => {
         <Typography
           variant="body1"
           color="text.secondary"
-          sx={{ cursor: "pointer" }}
+          sx={{ cursor: 'pointer' }}
           onClick={() => navigate(-1)}
         >
           Go back
@@ -85,7 +85,7 @@ const EditWord: React.FC = () => {
   }
 
   return (
-    <Box sx={{ maxWidth: "800px", mx: "auto", p: 3 }}>
+    <Box sx={{ maxWidth: '800px', mx: 'auto', p: 3 }}>
       <WordForm
         editWord={word}
         onWordUpdated={handleWordUpdated}

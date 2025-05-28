@@ -1,6 +1,6 @@
-import { API_ENDPOINTS } from "../config";
-import { Gender, Word, WordFormData, WordType } from "../types";
-import { api } from "./apiClient";
+import { API_ENDPOINTS } from '../config';
+import { Gender, Word, WordFormData, WordType } from '../types';
+import { api } from './apiClient';
 
 interface WordFilters {
   page?: number;
@@ -22,15 +22,15 @@ interface PaginatedResponse {
 export const wordService = {
   async getWords(filters?: WordFilters): Promise<PaginatedResponse> {
     const params = new URLSearchParams();
-    if (filters?.page) params.append("page", filters.page.toString());
-    if (filters?.size) params.append("size", filters.size.toString());
-    if (filters?.search) params.append("search", filters.search);
-    if (filters?.wordType) params.append("word_type", filters.wordType);
-    if (filters?.gender) params.append("gender", filters.gender);
-    if (filters?.includePending) params.append("include_pending", "true");
+    if (filters?.page) params.append('page', filters.page.toString());
+    if (filters?.size) params.append('size', filters.size.toString());
+    if (filters?.search) params.append('search', filters.search);
+    if (filters?.wordType) params.append('word_type', filters.wordType);
+    if (filters?.gender) params.append('gender', filters.gender);
+    if (filters?.includePending) params.append('include_pending', 'true');
 
     const response = await api.get<PaginatedResponse>(
-      `${API_ENDPOINTS.words}?${params.toString()}`,
+      `${API_ENDPOINTS.words}?${params.toString()}`
     );
     return response.data;
   },
@@ -61,18 +61,12 @@ export const wordService = {
   },
 
   async approveWord(id: number): Promise<Word> {
-    const response = await api.post<Word>(
-      `${API_ENDPOINTS.words}/${id}/approve`,
-      null,
-    );
+    const response = await api.post<Word>(`${API_ENDPOINTS.words}/${id}/approve`, null);
     return response.data;
   },
 
   async rejectWord(id: number): Promise<Word> {
-    const response = await api.post<Word>(
-      `${API_ENDPOINTS.words}/${id}/reject`,
-      null,
-    );
+    const response = await api.post<Word>(`${API_ENDPOINTS.words}/${id}/reject`, null);
     return response.data;
-  },
+  }
 };

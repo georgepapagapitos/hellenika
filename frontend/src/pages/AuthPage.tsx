@@ -1,9 +1,9 @@
-import { Box, Container } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import LoginForm from "../components/LoginForm";
-import RegisterForm from "../components/RegisterForm";
-import { useAuth } from "../contexts/AuthContext";
+import { Box, Container } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import LoginForm from '../components/LoginForm';
+import RegisterForm from '../components/RegisterForm';
+import { useAuth } from '../contexts/AuthContext';
 
 const AuthPage: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -12,33 +12,27 @@ const AuthPage: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/");
+      navigate('/');
     }
   }, [isAuthenticated, navigate]);
 
   const handleSuccess = () => {
-    navigate("/"); // Redirect to home page after successful auth
+    navigate('/'); // Redirect to home page after successful auth
   };
 
   return (
     <Container maxWidth="sm">
       <Box
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center'
         }}
       >
         {isLogin ? (
-          <LoginForm
-            onSuccess={handleSuccess}
-            onRegisterClick={() => setIsLogin(false)}
-          />
+          <LoginForm onSuccess={handleSuccess} onRegisterClick={() => setIsLogin(false)} />
         ) : (
-          <RegisterForm
-            onSuccess={handleSuccess}
-            onLoginClick={() => setIsLogin(true)}
-          />
+          <RegisterForm onSuccess={handleSuccess} onLoginClick={() => setIsLogin(true)} />
         )}
       </Box>
     </Container>

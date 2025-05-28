@@ -1,25 +1,25 @@
 export enum WordType {
-  NOUN = "noun",
-  VERB = "verb",
-  ADJECTIVE = "adjective",
-  ADVERB = "adverb",
-  PRONOUN = "pronoun",
-  PREPOSITION = "preposition",
-  CONJUNCTION = "conjunction",
-  ARTICLE = "article",
-  PREFIX = "prefix",
+  NOUN = 'noun',
+  VERB = 'verb',
+  ADJECTIVE = 'adjective',
+  ADVERB = 'adverb',
+  PRONOUN = 'pronoun',
+  PREPOSITION = 'preposition',
+  CONJUNCTION = 'conjunction',
+  ARTICLE = 'article',
+  PREFIX = 'prefix'
 }
 
 export enum Gender {
-  MASCULINE = "masculine",
-  FEMININE = "feminine",
-  NEUTER = "neuter",
+  MASCULINE = 'masculine',
+  FEMININE = 'feminine',
+  NEUTER = 'neuter'
 }
 
 export enum ApprovalStatus {
-  PENDING = "pending",
-  APPROVED = "approved",
-  REJECTED = "rejected",
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected'
 }
 
 export interface Meaning {

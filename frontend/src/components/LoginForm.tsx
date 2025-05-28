@@ -1,39 +1,29 @@
-import {
-  Alert,
-  Box,
-  Button,
-  Paper,
-  TextField,
-  Typography,
-} from "@mui/material";
-import React, { useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
+import { Alert, Box, Button, Paper, TextField, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface LoginFormProps {
   onSuccess: () => void;
   onRegisterClick: () => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({
-  onSuccess,
-  onRegisterClick,
-}) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string>("");
+const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onRegisterClick }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError('');
     setIsLoading(true);
 
     try {
       await login(email, password);
       onSuccess();
     } catch (err) {
-      setError("Invalid email or password");
+      setError('Invalid email or password');
     } finally {
       setIsLoading(false);
     }
@@ -45,20 +35,15 @@ const LoginForm: React.FC<LoginFormProps> = ({
       sx={{
         p: 4,
         maxWidth: 400,
-        width: "100%",
-        mx: "auto",
-        mt: 4,
+        width: '100%',
+        mx: 'auto',
+        mt: 4
       }}
     >
       <Typography variant="h5" component="h1" gutterBottom align="center">
         Welcome Back
       </Typography>
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        align="center"
-        sx={{ mb: 3 }}
-      >
+      <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>
         Sign in to continue learning Greek
       </Typography>
 
@@ -99,17 +84,13 @@ const LoginForm: React.FC<LoginFormProps> = ({
           disabled={isLoading}
           sx={{ mt: 3 }}
         >
-          {isLoading ? "Signing in..." : "Sign In"}
+          {isLoading ? 'Signing in...' : 'Sign In'}
         </Button>
 
-        <Box sx={{ mt: 2, textAlign: "center" }}>
+        <Box sx={{ mt: 2, textAlign: 'center' }}>
           <Typography variant="body2" color="text.secondary">
-            Don't have an account?{" "}
-            <Button
-              color="primary"
-              onClick={onRegisterClick}
-              sx={{ textTransform: "none" }}
-            >
+            Don't have an account?{' '}
+            <Button color="primary" onClick={onRegisterClick} sx={{ textTransform: 'none' }}>
               Sign up
             </Button>
           </Typography>
