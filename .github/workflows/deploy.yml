@@ -7,7 +7,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    needs: test # This ensures the CI workflow passes first
+    needs: [test-backend, test-frontend] # This ensures both test workflows pass first
 
     steps:
       - uses: actions/checkout@v4
